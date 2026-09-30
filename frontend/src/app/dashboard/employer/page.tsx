@@ -12,8 +12,10 @@ import {
   Briefcase, ShieldCheck, ShieldAlert, QrCode, CheckCircle2,
   AlertTriangle, XCircle, Sparkles, Cpu, Send, Lock, Check,
   History, FileText, ExternalLink, Zap, Flame, RefreshCw,
-  Shield, AlertCircle, Eye, ChevronRight, Info, X
+  Shield, AlertCircle, Eye, ChevronRight, Info, X, Scale, Brain
 } from "lucide-react";
+import CompareRecordsModal from "@/components/CompareRecordsModal";
+import { RecordComparison } from "@/lib/api";
 
 export default function EmployerDashboard() {
   const router = useRouter();
@@ -27,6 +29,7 @@ export default function EmployerDashboard() {
   const [verifyResult, setVerifyResult] = useState<VerificationResult | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [comparisonModalData, setComparisonModalData] = useState<RecordComparison | null>(null);
 
   // Tamper Lab
   const [tamperCandidate, setTamperCandidate] = useState<CredentialOut | null>(null);
@@ -371,6 +374,50 @@ export default function EmployerDashboard() {
                       </div>
                     ))}
                   </div>
+
+                  {/* Credential Intelligence & Duplicate QA Section */}
+                  <div className="pt-3 border-t border-white/[0.07]">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-xs font-mono uppercase text-[#7c78a0] font-bold flex items-center gap-1.5">
+                        <Brain className="w-3.5 h-3.5 text-teal-400" />
+                        Credential Intelligence QA
+                      </div>
+                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                        verifyResult.quality_status === "review_required" ? "badge-amber" : "badge-lime"
+                      }`}>
+                        {verifyResult.quality_status === "review_required" ? "⚠ REVIEW REQUIRED" : "✓ ZERO DISCREPANCIES"}
+                      </span>
+                    </div>
+
+                    {verifyResult.quality_issues && verifyResult.quality_issues.length > 0 ? (
+                      <div className="p-3.5 rounded-xl bg-amber-500/[0.08] border border-amber-500/25 space-y-2">
+                        <div className="text-xs text-amber-200">
+                          <strong>Advisory:</strong> Potential record discrepancy flagged for human administrative review.
+                        </div>
+                        {verifyResult.quality_issues.map((iss, idx) => (
+                          <div key={idx} className="text-[11px] text-amber-100 flex items-start gap-1.5">
+                            <span className="text-amber-400 font-bold">⚠</span>
+                            <span>{iss.message}</span>
+                          </div>
+                        ))}
+                        {verifyResult.quality_comparisons && verifyResult.quality_comparisons.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setComparisonModalData(verifyResult.quality_comparisons![0])}
+                            className="mt-2 px-3 py-1.5 rounded-lg btn-teal text-white text-xs font-bold flex items-center gap-1.5"
+                          >
+                            <Scale className="w-3 h-3" />
+                            <span>Compare Flagged Records Side-by-Side</span>
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="p-3 rounded-xl bg-emerald-500/[0.05] border border-emerald-500/15 text-[11px] text-emerald-300 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>All cross-record duplicate, conflict, and validity checks passed.</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -544,6 +591,15 @@ export default function EmployerDashboard() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* ── Modal: Side-by-Side Record Comparison ──── */}
+      {comparisonModalData && (
+        <CompareRecordsModal
+          comparison={comparisonModalData}
+          onClose={() => setComparisonModalData(null)}
+          issues={verifyResult?.quality_issues || []}
+        />
       )}
     </div>
   );

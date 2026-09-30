@@ -19,8 +19,12 @@ import {
   Share2,
   Cpu,
   Fingerprint,
-  QrCode
+  QrCode,
+  Scale,
+  Brain
 } from "lucide-react";
+import CompareRecordsModal from "@/components/CompareRecordsModal";
+import { RecordComparison } from "@/lib/api";
 
 export default function VerifyTokenPage({
   params,
@@ -34,6 +38,7 @@ export default function VerifyTokenPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRawJson, setShowRawJson] = useState(false);
+  const [comparisonModalData, setComparisonModalData] = useState<RecordComparison | null>(null);
 
   useEffect(() => {
     async function runVerification() {
@@ -215,6 +220,67 @@ export default function VerifyTokenPage({
               </div>
             </div>
 
+            {/* Credential Intelligence & Quality Check Section */}
+            <div className={`p-5 rounded-3xl glass-panel border ${
+              result.quality_status === "review_required" ? "border-amber-500/30 bg-amber-500/[0.03]" : "border-emerald-500/20"
+            }`}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.06]">
+                <div className="flex items-center gap-2">
+                  <Brain className="w-4 h-4 text-teal-400" />
+                  <h4 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+                    Credential Intelligence & Duplicate Check
+                  </h4>
+                </div>
+                <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase ${
+                  result.quality_status === "review_required" ? "badge-amber" : "badge-lime"
+                }`}>
+                  {result.quality_status === "review_required" ? "⚠ REVIEW REQUIRED" : "✓ ZERO DISCREPANCIES DETECTED"}
+                </span>
+              </div>
+
+              {result.quality_issues && result.quality_issues.length > 0 ? (
+                <div className="mt-3 space-y-2">
+                  <div className="text-xs text-amber-200">
+                    <strong>Advisory Flag:</strong> One or more cross-record items require administrative review before confirmation.
+                  </div>
+                  {result.quality_issues.map((iss, idx) => (
+                    <div key={idx} className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-100 flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2">
+                        <span className="text-amber-400 font-bold">⚠</span>
+                        <div>
+                          <span>{iss.message}</span>
+                          {iss.action && (
+                            <span className="block text-[11px] font-mono text-amber-300 mt-0.5">
+                              Action: {iss.action}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded badge-amber shrink-0">
+                        {iss.type.replace(/_/g, " ")}
+                      </span>
+                    </div>
+                  ))}
+
+                  {result.quality_comparisons && result.quality_comparisons.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setComparisonModalData(result.quality_comparisons![0])}
+                      className="mt-2 px-4 py-2 rounded-xl btn-teal text-white text-xs font-bold flex items-center gap-1.5 shadow-sm"
+                    >
+                      <Scale className="w-3.5 h-3.5" />
+                      <span>Compare Flagged Records Side-by-Side</span>
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-3 flex items-center gap-2 text-xs text-emerald-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Verified no exact duplicates, textual similarities, or conflicting graduation years across candidate credentials.</span>
+                </div>
+              )}
+            </div>
+
             {/* Verified Claims Card */}
             {result.credential_data && (
               <div className="p-6 rounded-3xl glass-panel border border-white/[0.08]">
@@ -305,6 +371,15 @@ export default function VerifyTokenPage({
             )}
           </div>
         ) : null}
+
+        {/* ── Modal: Side-by-Side Record Comparison ──── */}
+        {comparisonModalData && (
+          <CompareRecordsModal
+            comparison={comparisonModalData}
+            onClose={() => setComparisonModalData(null)}
+            issues={result?.quality_issues || []}
+          />
+        )}
       </main>
     </div>
   );

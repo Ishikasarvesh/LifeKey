@@ -54,8 +54,10 @@ class CredentialOut(BaseModel):
     expires_at: Optional[datetime] = None
     status: str
     issuer_name: Optional[str] = None
-    holder_name: Optional[str] = None
     revocation_reason: Optional[str] = None
+    quality_status: Optional[str] = None
+    quality_score: Optional[int] = None
+    quality_check: Optional[dict] = None
 
     class Config:
         from_attributes = True
@@ -116,6 +118,10 @@ class VerificationResult(BaseModel):
     overall_status: str
     reason: Optional[str] = None
     issued_at: Optional[datetime] = None
+    quality_status: Optional[str] = None
+    quality_score: Optional[int] = None
+    quality_issues: Optional[List[dict]] = None
+    quality_comparisons: Optional[List[dict]] = None
 
 class VerificationLogOut(BaseModel):
     id: str
@@ -207,6 +213,29 @@ class CredentialIntelReport(BaseModel):
     flags: List[CredentialIntelFlagOut]
     summary: dict  # counts per flag_type
     quality_score: int  # 0-100
+
+class CredentialQualityCheckRequest(BaseModel):
+    credential_id: Optional[str] = None
+    credential_type: Optional[str] = "DIPLOMA"
+    credential_data: Optional[dict] = None
+    holder_id: Optional[str] = None
+    holder_email: Optional[str] = None
+    expires_at: Optional[datetime] = None
+    threshold: Optional[float] = 0.75
+
+class CredentialQualityCheckResponse(BaseModel):
+    credential_id: Optional[str] = None
+    credential_title: str
+    status: str  # "review_required" | "no_issues"
+    quality_score: int
+    checks: dict
+    passed_checks: List[str]
+    issues: List[dict]
+    comparisons: List[dict]
+
+class RecordCompareRequest(BaseModel):
+    credential_id_a: str
+    credential_id_b: str
 
 # ─── Over-Share Warning ──────────────────────────────────
 

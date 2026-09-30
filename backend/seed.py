@@ -218,8 +218,88 @@ def seed_database():
     db.add(burn_token)
     db.commit()
 
+    # 11. Seed Student 2 with Credential Intelligence Test Scenario:
+    # Demonstrating Similar Record + Conflicting Graduation Year
+    ananya = User(
+        name="Ananya Sharma",
+        email="ananya@lifekey.id",
+        password_hash=hash_password("password123"),
+        role="STUDENT",
+        organization=None,
+    )
+    db.add(ananya)
+    db.commit()
+    db.refresh(ananya)
+
+    # Credential A for Ananya: B.Tech Information Technology (Graduation 2026)
+    ananya_cred_a_data = {
+        "title": "B.Tech Information Technology",
+        "major": "Information Technology",
+        "cgpa": "8.90",
+        "graduation_year": "2026",
+        "registration_no": "ABC-2022-IT-881",
+        "institution": "ABC Polytechnic Institute",
+        "_meta": {
+            "issuer_id": institution.id,
+            "issuer_name": institution.organization,
+            "holder_id": ananya.id,
+            "holder_name": ananya.name,
+            "credential_type": "DIPLOMA",
+            "issued_at": (datetime.now(timezone.utc) - timedelta(days=30)).isoformat(),
+        }
+    }
+    hash_a = hash_credential(ananya_cred_a_data)
+    sig_a = sign_credential(hash_a)
+    ananya_cred_a = Credential(
+        holder_id=ananya.id,
+        issuer_id=institution.id,
+        credential_type="DIPLOMA",
+        credential_data=json.dumps(ananya_cred_a_data),
+        credential_hash=hash_a,
+        signature=sig_a,
+        status="ACTIVE",
+    )
+    db.add(ananya_cred_a)
+
+    # Credential B for Ananya: Bachelor of Technology - IT (Graduation 2025 - CONFLICT + SIMILAR)
+    ananya_cred_b_data = {
+        "title": "Bachelor of Technology - IT",
+        "major": "Information Technology",
+        "cgpa": "8.85",
+        "graduation_year": "2025",  # Conflict: 2025 vs 2026
+        "registration_no": "ABC-2022-IT-881",
+        "institution": "ABC Polytechnic Institute",
+        "_meta": {
+            "issuer_id": institution.id,
+            "issuer_name": institution.organization,
+            "holder_id": ananya.id,
+            "holder_name": ananya.name,
+            "credential_type": "DIPLOMA",
+            "issued_at": datetime.now(timezone.utc).isoformat(),
+        }
+    }
+    hash_b = hash_credential(ananya_cred_b_data)
+    sig_b = sign_credential(hash_b)
+    ananya_cred_b = Credential(
+        holder_id=ananya.id,
+        issuer_id=institution.id,
+        credential_type="DIPLOMA",
+        credential_data=json.dumps(ananya_cred_b_data),
+        credential_hash=hash_b,
+        signature=sig_b,
+        status="ACTIVE",
+    )
+    db.add(ananya_cred_b)
+    db.commit()
+
+    # 12. Run Credential Intelligence for both students to populate live flags
+    from app.main import _run_credential_intelligence
+    _run_credential_intelligence(student.id, db)
+    _run_credential_intelligence(ananya.id, db)
+
     print(f"[LIFEKEY] Database seeded successfully!")
-    print(f"  • Student: parth@lifekey.id / password123")
+    print(f"  • Student (Clean): parth@lifekey.id / password123")
+    print(f"  • Student (Intelligence Review Flags): ananya@lifekey.id / password123")
     print(f"  • Institution: admin@abcpoly.edu.in / password123")
     print(f"  • Employer: hr@technova.com / password123")
     print(f"  • Demo QR Token: {demo_token}")

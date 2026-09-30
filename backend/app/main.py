@@ -28,9 +28,19 @@ from app.schemas import (
     BurnTokenCreate, BurnTokenOut, BurnVerifyResult,
     CredentialIntelFlagOut, CredentialIntelReport,
     OverShareCheckRequest, OverShareCheckResponse, OverShareWarning,
+    CredentialQualityCheckRequest, CredentialQualityCheckResponse,
+    RecordCompareRequest,
 )
-from app.auth import hash_password, verify_password, create_token, get_current_user
+from app.auth import hash_password, verify_password, create_token, get_current_user, get_current_user_optional
 from app.crypto import hash_credential, sign_credential, verify_signature, verify_integrity
+from app.intelligence import (
+    run_credential_quality_check,
+    build_record_comparison,
+    check_field_conflicts,
+    compute_similarity,
+    normalize_text,
+    clean_basic_text,
+)
 
 Base.metadata.create_all(bind=engine)
 
@@ -220,7 +230,24 @@ def issue_credential(
     # Run intelligence analysis after every new credential
     _run_credential_intelligence(holder.id, db)
 
-    return _credential_to_out(credential, db)
+    out = _credential_to_out(credential, db)
+    # Immediate quality check for this newly issued credential
+    holder_creds = db.query(Credential).filter(
+        Credential.holder_id == holder.id,
+        Credential.id != credential.id,
+    ).all()
+    q_report = run_credential_quality_check(
+        credential_id=credential.id,
+        credential_type=credential.credential_type,
+        credential_data=full_data,
+        expires_at=credential.expires_at,
+        issuer_user=current_user,
+        existing_credentials=holder_creds,
+    )
+    out.quality_status = q_report["status"]
+    out.quality_score = q_report["quality_score"]
+    out.quality_check = q_report
+    return out
 
 
 @app.get("/api/credentials/issued", response_model=List[CredentialOut])
@@ -762,9 +789,10 @@ def get_my_burn_tokens(
 
 def _run_credential_intelligence(holder_id: str, db: Session):
     """
-    Runs the intelligence engine on all credentials for a holder.
+    Runs the comprehensive Credential Intelligence engine on all credentials for a holder.
+    Uses normalization, exact duplicate detection, similarity mechanism,
+    conflict detection, missing field detection, expiry check, and issuer consistency.
     Generates CredentialIntelFlag records for any issues detected.
-    Called automatically after every credential issuance.
     """
     creds = db.query(Credential).filter(Credential.holder_id == holder_id).all()
 
@@ -775,113 +803,189 @@ def _run_credential_intelligence(holder_id: str, db: Session):
     ).delete(synchronize_session=False)
     db.flush()
 
-    now = datetime.now(timezone.utc)
-    REQUIRED_FIELDS = ["title"]
+    for cred in creds:
+        cred_data = json.loads(cred.credential_data)
+        issuer_user = db.query(User).filter(User.id == cred.issuer_id).first()
+        other_creds = [c for c in creds if c.id != cred.id]
 
-    for i, cred_a in enumerate(creds):
-        data_a = json.loads(cred_a.credential_data)
+        report = run_credential_quality_check(
+            credential_id=cred.id,
+            credential_type=cred.credential_type,
+            credential_data=cred_data,
+            expires_at=cred.expires_at,
+            issuer_user=issuer_user,
+            existing_credentials=other_creds,
+        )
 
-        # 1. Check for missing required fields
-        for field in REQUIRED_FIELDS:
-            if field not in data_a or not data_a[field]:
-                db.add(CredentialIntelFlag(
-                    holder_id=holder_id,
-                    credential_id_a=cred_a.id,
-                    flag_type="MISSING_FIELD",
-                    description=f"Required field '{field}' is missing or empty.",
-                    severity="MEDIUM",
-                ))
+        for issue in report.get("issues", []):
+            itype = issue.get("type")
+            flag_type_map = {
+                "duplicate": "DUPLICATE",
+                "similar": "SIMILAR",
+                "conflict": "CONFLICT",
+                "missing_field": "MISSING_FIELD",
+                "expired": "EXPIRED",
+                "issuer_consistency": "ISSUER_MISMATCH",
+            }
+            ft = flag_type_map.get(itype, "CONFLICT")
+            sev = "HIGH" if itype in ("duplicate", "conflict", "expired") else "MEDIUM"
+            if itype == "similar":
+                sev = "LOW"
 
-        # 2. Check for expiry
-        if cred_a.expires_at:
-            exp = cred_a.expires_at
-            if exp.tzinfo is None:
-                exp = exp.replace(tzinfo=timezone.utc)
-            if exp < now:
-                db.add(CredentialIntelFlag(
-                    holder_id=holder_id,
-                    credential_id_a=cred_a.id,
-                    flag_type="EXPIRED",
-                    description=f"Credential expired on {cred_a.expires_at.strftime('%Y-%m-%d')}.",
-                    severity="HIGH",
-                ))
-
-        for cred_b in creds[i+1:]:
-            data_b = json.loads(cred_b.credential_data)
-
-            # 3. Detect exact duplicates (same type + same issuer + same title)
-            title_a = str(data_a.get("title", "")).strip().lower()
-            title_b = str(data_b.get("title", "")).strip().lower()
-            if (
-                cred_a.credential_type == cred_b.credential_type
-                and cred_a.issuer_id == cred_b.issuer_id
-                and title_a == title_b
-                and title_a != ""
-            ):
-                db.add(CredentialIntelFlag(
-                    holder_id=holder_id,
-                    credential_id_a=cred_a.id,
-                    credential_id_b=cred_b.id,
-                    flag_type="DUPLICATE",
-                    description=(
-                        f"Exact duplicate detected: Two '{cred_a.credential_type}' credentials "
-                        f"titled '{data_a.get('title')}' from the same issuer."
-                    ),
-                    severity="HIGH",
-                ))
+            rel_id = issue.get("related_credential_id")
+            # Avoid reciprocal duplicated flags
+            if rel_id and cred.id > rel_id:
                 continue
 
-            # 4. Detect similar credentials (same type, different content)
-            if cred_a.credential_type == cred_b.credential_type and title_a and title_b:
-                # Simple similarity: if one title is a substring of another
-                if (title_a in title_b or title_b in title_a) and title_a != title_b:
-                    db.add(CredentialIntelFlag(
-                        holder_id=holder_id,
-                        credential_id_a=cred_a.id,
-                        credential_id_b=cred_b.id,
-                        flag_type="SIMILAR",
-                        description=(
-                            f"Similar credentials detected: '{data_a.get('title')}' and "
-                            f"'{data_b.get('title')}'. Review to ensure these are distinct awards."
-                        ),
-                        severity="LOW",
-                    ))
-
-            # 5. Detect year/date conflicts
-            year_a = data_a.get("graduation_year") or data_a.get("year")
-            year_b = data_b.get("graduation_year") or data_b.get("year")
-            if year_a and year_b and str(year_a) != str(year_b):
-                if cred_a.credential_type in ("DIPLOMA", "DEGREE") and cred_b.credential_type in ("DIPLOMA", "DEGREE"):
-                    db.add(CredentialIntelFlag(
-                        holder_id=holder_id,
-                        credential_id_a=cred_a.id,
-                        credential_id_b=cred_b.id,
-                        flag_type="DATE_CONFLICT",
-                        description=(
-                            f"Graduation year conflict: One record states {year_a}, "
-                            f"another states {year_b}. Re-verification recommended."
-                        ),
-                        severity="HIGH",
-                    ))
-
-            # 6. Detect issuer name inconsistency for same institution
-            if cred_a.issuer_id == cred_b.issuer_id:
-                issuer_name_a = data_a.get("_meta", {}).get("issuer_name", "")
-                issuer_name_b = data_b.get("_meta", {}).get("issuer_name", "")
-                if issuer_name_a and issuer_name_b and issuer_name_a.strip() != issuer_name_b.strip():
-                    db.add(CredentialIntelFlag(
-                        holder_id=holder_id,
-                        credential_id_a=cred_a.id,
-                        credential_id_b=cred_b.id,
-                        flag_type="ISSUER_MISMATCH",
-                        description=(
-                            f"Issuer name inconsistency: Same institution ID but different names "
-                            f"('{issuer_name_a}' vs '{issuer_name_b}')."
-                        ),
-                        severity="MEDIUM",
-                    ))
+            db.add(CredentialIntelFlag(
+                holder_id=holder_id,
+                credential_id_a=cred.id,
+                credential_id_b=rel_id,
+                flag_type=ft,
+                description=issue.get("message", "Flagged for human review"),
+                severity=sev,
+            ))
 
     db.commit()
+
+
+@app.post("/api/credentials/intelligence/check", response_model=CredentialQualityCheckResponse)
+@app.post("/credentials/intelligence/check", response_model=CredentialQualityCheckResponse)
+def check_credential_intelligence(
+    req: CredentialQualityCheckRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    """
+    Credential Intelligence Quality Check Endpoint:
+    Receives either an existing credential_id OR raw credential data to evaluate.
+    Runs all 6 intelligence checks:
+    1. Exact duplicates
+    2. Similar credential records
+    3. Conflicting information
+    4. Missing required fields
+    5. Expired credentials
+    6. Inconsistent issuer details
+    Returns the unified quality-check result.
+    NEVER automatically declares a credential fraudulent; flags issues for human review.
+    """
+    threshold = req.threshold if req.threshold is not None else 0.75
+    
+    if req.credential_id:
+        target_cred = db.query(Credential).filter(Credential.id == req.credential_id).first()
+        if not target_cred:
+            raise HTTPException(status_code=404, detail="Credential not found")
+        cred_data = json.loads(target_cred.credential_data)
+        cred_type = target_cred.credential_type
+        expires_at = target_cred.expires_at
+        holder_id = target_cred.holder_id
+        issuer_user = db.query(User).filter(User.id == target_cred.issuer_id).first()
+        other_creds = db.query(Credential).filter(
+            Credential.holder_id == holder_id,
+            Credential.id != target_cred.id
+        ).all()
+        cred_id = target_cred.id
+    else:
+        cred_data = req.credential_data or {}
+        cred_type = req.credential_type or "DIPLOMA"
+        expires_at = req.expires_at
+        cred_id = None
+
+        holder = None
+        if req.holder_id:
+            holder = db.query(User).filter(User.id == req.holder_id).first()
+        elif req.holder_email:
+            holder = db.query(User).filter(User.email == req.holder_email).first()
+        elif current_user and current_user.role == "STUDENT":
+            holder = current_user
+
+        if holder:
+            other_creds = db.query(Credential).filter(Credential.holder_id == holder.id).all()
+        else:
+            other_creds = db.query(Credential).all()
+
+        issuer_user = None
+        if current_user and current_user.role == "INSTITUTION":
+            issuer_user = current_user
+        else:
+            meta = cred_data.get("_meta", {})
+            issuer_id = meta.get("issuer_id")
+            if issuer_id:
+                issuer_user = db.query(User).filter(User.id == issuer_id).first()
+            if not issuer_user:
+                inst_name = cred_data.get("institution") or meta.get("issuer_name")
+                if inst_name:
+                    issuer_user = db.query(User).filter(
+                        (User.organization == inst_name) | (User.name == inst_name)
+                    ).first()
+
+    report = run_credential_quality_check(
+        credential_id=cred_id,
+        credential_type=cred_type,
+        credential_data=cred_data,
+        expires_at=expires_at,
+        issuer_user=issuer_user,
+        existing_credentials=other_creds,
+        threshold=threshold,
+    )
+
+    return CredentialQualityCheckResponse(**report)
+
+
+@app.get("/api/credentials/{credential_id}/intelligence", response_model=CredentialQualityCheckResponse)
+def get_credential_intelligence_endpoint(
+    credential_id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    """Runs on-demand intelligence check on a specific existing credential."""
+    target_cred = db.query(Credential).filter(Credential.id == credential_id).first()
+    if not target_cred:
+        raise HTTPException(status_code=404, detail="Credential not found")
+
+    cred_data = json.loads(target_cred.credential_data)
+    issuer_user = db.query(User).filter(User.id == target_cred.issuer_id).first()
+    other_creds = db.query(Credential).filter(
+        Credential.holder_id == target_cred.holder_id,
+        Credential.id != target_cred.id
+    ).all()
+
+    report = run_credential_quality_check(
+        credential_id=target_cred.id,
+        credential_type=target_cred.credential_type,
+        credential_data=cred_data,
+        expires_at=target_cred.expires_at,
+        issuer_user=issuer_user,
+        existing_credentials=other_creds,
+    )
+    return CredentialQualityCheckResponse(**report)
+
+
+@app.post("/api/credentials/intelligence/compare")
+def compare_credentials_endpoint(
+    req: RecordCompareRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    """Compares any two credentials side-by-side and returns highlighted field diffs."""
+    cred_a = db.query(Credential).filter(Credential.id == req.credential_id_a).first()
+    cred_b = db.query(Credential).filter(Credential.id == req.credential_id_b).first()
+    if not cred_a or not cred_b:
+        raise HTTPException(status_code=404, detail="One or both credentials could not be found")
+
+    data_a = json.loads(cred_a.credential_data)
+    data_b = json.loads(cred_b.credential_data)
+
+    conflicts = check_field_conflicts(data_a, data_b, cred_a.credential_type, cred_b.credential_type)
+    return build_record_comparison(
+        cred_a_id=cred_a.id,
+        cred_a_title=data_a.get("title", "Credential A"),
+        cred_a_data=data_a,
+        cred_b_id=cred_b.id,
+        cred_b_title=data_b.get("title", "Credential B"),
+        cred_b_data=data_b,
+        conflicts=conflicts,
+    )
 
 
 @app.get("/api/intel/report", response_model=CredentialIntelReport)
@@ -1022,6 +1126,19 @@ def list_students(
 def _credential_to_out(cred: Credential, db: Session) -> CredentialOut:
     issuer = db.query(User).filter(User.id == cred.issuer_id).first()
     holder = db.query(User).filter(User.id == cred.holder_id).first()
+
+    flags = db.query(CredentialIntelFlag).filter(
+        (CredentialIntelFlag.credential_id_a == cred.id) | (CredentialIntelFlag.credential_id_b == cred.id),
+        CredentialIntelFlag.resolved == False,
+    ).all()
+    q_status = "review_required" if len(flags) > 0 else "no_issues"
+    q_score = 100
+    for f in flags:
+        if f.severity == "HIGH": q_score -= 20
+        elif f.severity == "MEDIUM": q_score -= 10
+        else: q_score -= 5
+    q_score = max(0, q_score)
+
     return CredentialOut(
         id=cred.id,
         holder_id=cred.holder_id,
@@ -1035,6 +1152,8 @@ def _credential_to_out(cred: Credential, db: Session) -> CredentialOut:
         issuer_name=issuer.organization or issuer.name if issuer else None,
         holder_name=holder.name if holder else None,
         revocation_reason=cred.revocation_reason,
+        quality_status=q_status,
+        quality_score=q_score,
     )
 
 
@@ -1116,6 +1235,20 @@ def _verify_credential(
         overall = "VALID"
         reason = "All checks passed. Credential is authentic and valid."
 
+    # Compute Credential Intelligence Quality Report for verification
+    other_creds = db.query(Credential).filter(
+        Credential.holder_id == cred.holder_id,
+        Credential.id != cred.id,
+    ).all()
+    q_report = run_credential_quality_check(
+        credential_id=cred.id,
+        credential_type=cred.credential_type,
+        credential_data=check_data,
+        expires_at=cred.expires_at,
+        issuer_user=issuer,
+        existing_credentials=other_creds,
+    )
+
     return VerificationResult(
         credential_id=cred.id,
         candidate_name=holder.name if holder else None,
@@ -1129,4 +1262,8 @@ def _verify_credential(
         overall_status=overall,
         reason=reason,
         issued_at=cred.issued_at,
+        quality_status=q_report["status"],
+        quality_score=q_report["quality_score"],
+        quality_issues=q_report["issues"],
+        quality_comparisons=q_report["comparisons"],
     )

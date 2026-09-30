@@ -26,6 +26,9 @@ export interface CredentialOut {
   issuer_name?: string | null;
   holder_name?: string | null;
   revocation_reason?: string | null;
+  quality_status?: "no_issues" | "review_required" | null;
+  quality_score?: number | null;
+  quality_check?: CredentialQualityReport | null;
 }
 
 export interface ConsentRequestOut {
@@ -57,9 +60,13 @@ export interface VerificationResult {
   integrity_valid: boolean;
   revocation_status: "ACTIVE" | "REVOKED" | "EXPIRED";
   consent_valid: boolean;
-  overall_status: "VALID" | "TAMPERED" | "REVOKED" | "EXPIRED" | "INVALID";
   reason?: string | null;
   issued_at?: string | null;
+  overall_status?: "VALID" | "TAMPERED" | "REVOKED" | "EXPIRED" | "INVALID_CONSENT" | "FLAGGED_REVIEW" | string;
+  quality_status?: "no_issues" | "review_required" | null;
+  quality_score?: number | null;
+  quality_issues?: QualityIssue[] | null;
+  quality_comparisons?: RecordComparison[] | null;
 }
 
 export interface TransitionStatus {
@@ -130,6 +137,55 @@ export interface CredentialIntelReport {
   flags: CredentialIntelFlag[];
   summary: Record<string, number>;
   quality_score: number;
+}
+
+export interface QualityIssue {
+  type: string;
+  severity: "warning" | "low" | "medium" | "high";
+  status: string;
+  message: string;
+  field?: string | null;
+  value_1?: string | null;
+  value_2?: string | null;
+  action?: string | null;
+  similarity_score?: number | null;
+  related_credential_id?: string | null;
+  related_credential_title?: string | null;
+}
+
+export interface ComparisonField {
+  field_name: string;
+  field_key: string;
+  record_a_value: string;
+  record_b_value: string;
+  is_conflict: boolean;
+  is_match: boolean;
+}
+
+export interface RecordComparison {
+  record_a_id: string;
+  record_a_title: string;
+  record_b_id: string;
+  record_b_title: string;
+  comparison_fields: ComparisonField[];
+}
+
+export interface CredentialQualityReport {
+  credential_id?: string | null;
+  credential_title: string;
+  status: "no_issues" | "review_required";
+  quality_score: number;
+  checks: {
+    duplicate: boolean;
+    similar: boolean;
+    conflict: boolean;
+    missing_fields: boolean;
+    expired: boolean;
+    issuer_consistency: boolean;
+  };
+  passed_checks: string[];
+  issues: QualityIssue[];
+  comparisons: RecordComparison[];
 }
 
 // ─── Over-Share ───────────────────────────────────────────
@@ -304,6 +360,29 @@ export const api = {
   getIntelReport: () => apiRequest<CredentialIntelReport>("/api/intel/report"),
   resolveIntelFlag: (flagId: string) =>
     apiRequest<{ message: string }>(`/api/intel/resolve/${flagId}`, { method: "POST" }),
+
+  checkIntelligence: (payload: {
+    credential_id?: string;
+    credential_type?: string;
+    credential_data?: Record<string, any>;
+    holder_email?: string;
+    holder_id?: string;
+    expires_at?: string | null;
+    threshold?: number;
+  }) =>
+    apiRequest<CredentialQualityReport>("/api/credentials/intelligence/check", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  getCredentialIntelligence: (credentialId: string) =>
+    apiRequest<CredentialQualityReport>(`/api/credentials/${credentialId}/intelligence`),
+
+  compareRecords: (credentialIdA: string, credentialIdB: string) =>
+    apiRequest<RecordComparison>("/api/credentials/intelligence/compare", {
+      method: "POST",
+      body: JSON.stringify({ credential_id_a: credentialIdA, credential_id_b: credentialIdB }),
+    }),
 
   // Life Transition
   getTransitionStatus: () => apiRequest<TransitionStatus>("/api/transition/status"),

@@ -33,11 +33,16 @@ import {
   Filter,
   CheckCircle,
   TrendingUp,
-  FileWarning,
   RefreshCw,
   Zap,
-  Info
+  Info,
+  Scale,
+  Play,
+  FlaskConical,
 } from "lucide-react";
+import CompareRecordsModal from "@/components/CompareRecordsModal";
+import CredentialQualityModal from "@/components/CredentialQualityModal";
+import { CredentialQualityReport, RecordComparison } from "@/lib/api";
 
 export default function InstitutionDashboard() {
   const router = useRouter();
@@ -59,9 +64,15 @@ export default function InstitutionDashboard() {
   const [major, setMajor] = useState("Computer Science & AI");
   const [cgpa, setCgpa] = useState("8.85");
   const [graduationYear, setGraduationYear] = useState("2026");
-  const [skills, setSkills] = useState("Python, Machine Learning, React, SQL");
+  const [skills, setSkills] = useState("Python, Machine Learning, Deep Learning, React");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [issueSuccess, setIssueSuccess] = useState<string | null>(null);
+
+  // Intelligence Quality & Comparison Modal state
+  const [qualityModalReport, setQualityModalReport] = useState<CredentialQualityReport | null>(null);
+  const [comparisonModalData, setComparisonModalData] = useState<RecordComparison | null>(null);
+  const [comparingLoading, setComparingLoading] = useState(false);
+  const [testScenarioLoading, setTestScenarioLoading] = useState<string | null>(null);
 
   // Revocation modal state
   const [revokingCredId, setRevokingCredId] = useState<string | null>(null);
@@ -154,11 +165,135 @@ export default function InstitutionDashboard() {
       setIssueSuccess(`Successfully issued ${res.credential_type} to ${studentEmail}! Cryptographically signed with RSA-2048.`);
       loadData();
       loadIntel();
+      if (res.quality_check) {
+        setQualityModalReport(res.quality_check);
+      }
       setTimeout(() => setIssueSuccess(null), 5000);
     } catch (err: any) {
       alert(err.message || "Failed to issue credential");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleOpenCompare = async (credAId: string, credBId: string) => {
+    try {
+      setComparingLoading(true);
+      const comp = await api.compareRecords(credAId, credBId);
+      setComparisonModalData(comp);
+    } catch (err: any) {
+      alert(err.message || "Failed to generate comparison table");
+    } finally {
+      setComparingLoading(false);
+    }
+  };
+
+  const handleRunScenarioTest = async (scenarioKey: string) => {
+    try {
+      setTestScenarioLoading(scenarioKey);
+      let payload: any = {};
+
+      if (scenarioKey === "A") {
+        payload = {
+          credential_type: "DIPLOMA",
+          holder_email: "parth@lifekey.id",
+          credential_data: {
+            title: "Advanced Cloud Architecture & Systems",
+            major: "Cloud Infrastructure",
+            cgpa: "9.20",
+            graduation_year: "2026",
+            institution: user?.organization || "ABC Polytechnic Institute",
+          },
+        };
+      } else if (scenarioKey === "B") {
+        payload = {
+          credential_type: "DIPLOMA",
+          holder_email: "parth@lifekey.id",
+          credential_data: {
+            title: "diploma in artificial intelligence & machine learning",
+            major: "Computer Science & AI",
+            cgpa: "8.85",
+            graduation_year: "2026",
+            institution: user?.organization || "ABC Polytechnic Institute",
+          },
+        };
+      } else if (scenarioKey === "C") {
+        payload = {
+          credential_type: "DIPLOMA",
+          holder_email: "parth@lifekey.id",
+          credential_data: {
+            title: "Bachelor of Technology - AIML",
+            major: "Artificial Intelligence",
+            cgpa: "8.75",
+            graduation_year: "2026",
+            institution: user?.organization || "ABC Polytechnic Institute",
+          },
+        };
+      } else if (scenarioKey === "D") {
+        payload = {
+          credential_type: "DIPLOMA",
+          holder_email: "parth@lifekey.id",
+          credential_data: {
+            title: "Diploma in AI & Machine Learning",
+            major: "Computer Science & AI",
+            cgpa: "8.85",
+            graduation_year: "2024",
+            institution: user?.organization || "ABC Polytechnic Institute",
+          },
+        };
+      } else if (scenarioKey === "E") {
+        payload = {
+          credential_type: "DIPLOMA",
+          holder_email: "parth@lifekey.id",
+          credential_data: {
+            title: "Diploma in Mechanical Engineering",
+            major: "Mechanical Engineering",
+            cgpa: "8.10",
+            institution: user?.organization || "ABC Polytechnic Institute",
+          },
+        };
+      } else if (scenarioKey === "F") {
+        payload = {
+          credential_type: "CERTIFICATE",
+          holder_email: "parth@lifekey.id",
+          expires_at: "2025-01-01T00:00:00Z",
+          credential_data: {
+            title: "Cloud Infrastructure Professional",
+            valid_until: "2025-01-01",
+            institution: user?.organization || "ABC Polytechnic Institute",
+          },
+        };
+      } else if (scenarioKey === "G") {
+        payload = {
+          credential_type: "CERTIFICATE",
+          holder_email: "parth@lifekey.id",
+          credential_data: {
+            title: "Certificate in Quantum Computing",
+            institution: "Unregistered External University",
+            _meta: { issuer_name: "Unregistered External University" },
+          },
+        };
+      } else if (scenarioKey === "H") {
+        payload = {
+          credential_type: "DIPLOMA",
+          holder_email: "parth@lifekey.id",
+          expires_at: "2024-12-31T00:00:00Z",
+          credential_data: {
+            title: "Bachelor of Technology - AIML",
+            major: "AI & ML",
+            graduation_year: "2023",
+            institution: "Different Technical College",
+            valid_until: "2024-12-31",
+          },
+        };
+      }
+
+      const report = await api.checkIntelligence(payload);
+      setQualityModalReport(report);
+    } catch (err: any) {
+      alert(err.message || "Failed to run scenario check");
+    } finally {
+      setTestScenarioLoading(null);
     }
   };
 
@@ -586,6 +721,63 @@ export default function InstitutionDashboard() {
               </div>
             </div>
 
+            {/* Scenario Testing Lab */}
+            <div className="p-6 rounded-3xl glass-panel border border-violet-500/25">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
+                <div className="flex items-center gap-2">
+                  <FlaskConical className="w-5 h-5 text-violet-400" />
+                  <div>
+                    <h4 className="text-base font-bold text-white">
+                      Live Scenario Testing Lab
+                    </h4>
+                    <p className="text-xs text-[#7c78a0]">
+                      Run pre-configured test cases (Scenarios A through H) through the Credential Intelligence engine.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono uppercase px-2.5 py-1 rounded badge-violet font-bold">
+                  8 TEST SCENARIOS
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {[
+                  { key: "A", label: "A. Perfect Credential", desc: "No issues, 100% QA score", badge: "badge-lime" },
+                  { key: "B", label: "B. Exact Duplicate", desc: "Matches canonical record", badge: "badge-amber" },
+                  { key: "C", label: "C. Similar Credential", desc: "B.Tech IT vs B.Tech AIML", badge: "badge-violet" },
+                  { key: "D", label: "D. Conflicting Year", desc: "2024 vs 2026 mismatch", badge: "badge-rose" },
+                  { key: "E", label: "E. Missing Field", desc: "Omitted graduation year", badge: "badge-amber" },
+                  { key: "F", label: "F. Expired Credential", desc: "Validity date in past", badge: "badge-rose" },
+                  { key: "G", label: "G. Issuer Mismatch", desc: "Unregistered authority name", badge: "badge-amber" },
+                  { key: "H", label: "H. Compound Multi-Issue", desc: "Similar + Conflict + Missing + Expired", badge: "badge-rose" },
+                ].map((sc) => (
+                  <button
+                    key={sc.key}
+                    onClick={() => handleRunScenarioTest(sc.key)}
+                    disabled={testScenarioLoading !== null}
+                    className="p-3.5 rounded-2xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] hover:border-violet-500/40 text-left transition-all group disabled:opacity-50"
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${sc.badge}`}>
+                        {sc.key}
+                      </span>
+                      {testScenarioLoading === sc.key ? (
+                        <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Play className="w-3.5 h-3.5 text-gray-500 group-hover:text-violet-400 transition-colors" />
+                      )}
+                    </div>
+                    <div className="text-xs font-bold text-white group-hover:text-violet-300 transition-colors">
+                      {sc.label}
+                    </div>
+                    <div className="text-[11px] text-[#7c78a0] mt-0.5 line-clamp-1">
+                      {sc.desc}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Flags List */}
             {intelLoading ? (
               <div className="p-12 text-center text-gray-400 text-sm glass-panel rounded-2xl">
@@ -647,20 +839,33 @@ export default function InstitutionDashboard() {
                           </div>
                         </div>
 
-                        <button
-                          onClick={() => handleResolveFlag(flag.id)}
-                          disabled={resolvingFlagId === flag.id}
-                          className="px-4 py-2 rounded-xl btn-teal text-white text-xs font-bold shrink-0 flex items-center gap-1.5 disabled:opacity-50"
-                        >
-                          {resolvingFlagId === flag.id ? (
-                            <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                          ) : (
-                            <>
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              <span>Mark Audited</span>
-                            </>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {flag.credential_id_b && (
+                            <button
+                              onClick={() => handleOpenCompare(flag.credential_id_a, flag.credential_id_b!)}
+                              disabled={comparingLoading}
+                              className="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all flex items-center gap-1.5"
+                            >
+                              <Scale className="w-3.5 h-3.5" />
+                              <span>Compare Records</span>
+                            </button>
                           )}
-                        </button>
+
+                          <button
+                            onClick={() => handleResolveFlag(flag.id)}
+                            disabled={resolvingFlagId === flag.id}
+                            className="px-4 py-2 rounded-xl btn-teal text-white text-xs font-bold flex items-center gap-1.5 disabled:opacity-50"
+                          >
+                            {resolvingFlagId === flag.id ? (
+                              <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            ) : (
+                              <>
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                <span>Mark Audited</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -720,6 +925,28 @@ export default function InstitutionDashboard() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Quality Check Result Modal */}
+        {qualityModalReport && (
+          <CredentialQualityModal
+            report={qualityModalReport}
+            onClose={() => setQualityModalReport(null)}
+            onOpenCompare={(comp) => {
+              setComparisonModalData(comp);
+            }}
+          />
+        )}
+
+        {/* Side-by-Side Record Comparison Modal */}
+        {comparisonModalData && (
+          <CompareRecordsModal
+            comparison={comparisonModalData}
+            onClose={() => setComparisonModalData(null)}
+            onAcknowledge={() => {
+              loadIntel();
+            }}
+          />
         )}
       </main>
     </div>

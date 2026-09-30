@@ -15,8 +15,11 @@ import {
   Share2, FileText, QrCode, Sparkles, Layers, AlertCircle, Eye, Check,
   X, Lock, ExternalLink, ShieldAlert, Zap, Flame, Brain, Camera,
   ChevronRight, RefreshCw, AlertTriangle, XCircle, Shield, Hash,
-  Fingerprint, ScanLine, Lightbulb, Copy, CheckCheck
+  Fingerprint, ScanLine, Lightbulb, Copy, CheckCheck, Scale
 } from "lucide-react";
+import CompareRecordsModal from "@/components/CompareRecordsModal";
+import CredentialQualityModal from "@/components/CredentialQualityModal";
+import { RecordComparison, CredentialQualityReport } from "@/lib/api";
 
 type ActiveTab = "wallet" | "zk" | "burn" | "intel" | "camera";
 
@@ -37,6 +40,9 @@ export default function StudentDashboard() {
   const [qrModalToken, setQrModalToken] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [comparisonModalData, setComparisonModalData] = useState<RecordComparison | null>(null);
+  const [qualityModalReport, setQualityModalReport] = useState<CredentialQualityReport | null>(null);
+  const [comparingLoading, setComparingLoading] = useState(false);
 
   // ZK Proof form
   const [zkCredId, setZkCredId] = useState("");
@@ -151,6 +157,18 @@ export default function StudentDashboard() {
       setIntelReport(updated);
     } catch (err: any) {
       alert(err.message || "Failed to resolve flag");
+    }
+  };
+
+  const handleOpenCompare = async (credAId: string, credBId: string) => {
+    try {
+      setComparingLoading(true);
+      const comp = await api.compareRecords(credAId, credBId);
+      setComparisonModalData(comp);
+    } catch (err: any) {
+      alert(err.message || "Failed to load record comparison");
+    } finally {
+      setComparingLoading(false);
     }
   };
 
@@ -386,12 +404,21 @@ export default function StudentDashboard() {
                                <FileText className="w-5 h-5" />}
                             </div>
                             <div>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded badge-violet font-bold">{cred.credential_type}</span>
-                                <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
-                                  cred.status === "ACTIVE" ? "badge-lime" : "badge-rose"
-                                }`}>{cred.status}</span>
-                              </div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded badge-violet font-bold">{cred.credential_type}</span>
+                                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                                    cred.status === "ACTIVE" ? "badge-lime" : "badge-rose"
+                                  }`}>{cred.status}</span>
+                                  {cred.quality_status === "review_required" ? (
+                                    <span className="text-[10px] font-mono px-2 py-0.5 rounded font-bold badge-amber flex items-center gap-1">
+                                      ⚠ Review Item
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] font-mono px-2 py-0.5 rounded font-bold badge-lime flex items-center gap-1">
+                                      ✓ QA Verified
+                                    </span>
+                                  )}
+                                </div>
                               <h4 className="text-sm font-bold text-white mt-1.5">{data.title || "Verifiable Credential"}</h4>
                               <p className="text-xs text-[#8d8aab] mt-0.5">
                                 Issuer: <strong className="text-[#c4c0dc]">{cred.issuer_name}</strong>
@@ -729,10 +756,19 @@ export default function StudentDashboard() {
                                   <p className="text-xs text-[#c4c0dc] mt-1.5 leading-relaxed">{flag.description}</p>
                                 </div>
                               </div>
-                              <button onClick={() => handleResolveFlag(flag.id)}
-                                className="shrink-0 px-3 py-1.5 rounded-lg btn-ghost text-[11px] font-semibold border border-white/[0.07]">
-                                Resolve
-                              </button>
+                              <div className="flex items-center gap-2 shrink-0">
+                                {flag.credential_id_b && (
+                                  <button onClick={() => handleOpenCompare(flag.credential_id_a, flag.credential_id_b!)}
+                                    disabled={comparingLoading}
+                                    className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold flex items-center gap-1">
+                                    <Scale className="w-3 h-3" /> Compare Records
+                                  </button>
+                                )}
+                                <button onClick={() => handleResolveFlag(flag.id)}
+                                  className="px-3 py-1.5 rounded-lg btn-ghost text-[11px] font-semibold border border-white/[0.07]">
+                                  Resolve
+                                </button>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -991,7 +1027,21 @@ export default function StudentDashboard() {
                 <strong>Signature:</strong> RSA-2048 PKCS#1 PSS. Verifiable without contacting the original issuer.
               </div>
             </div>
-            <div className="mt-5 flex justify-end">
+            <div className="mt-5 flex items-center justify-between gap-3">
+              <button
+                onClick={async () => {
+                  try {
+                    const rep = await api.getCredentialIntelligence(activeModalCred.id);
+                    setQualityModalReport(rep);
+                  } catch (err: any) {
+                    alert(err.message || "Failed to run quality check");
+                  }
+                }}
+                className="px-4 py-2 rounded-xl btn-teal text-white text-xs font-bold flex items-center gap-1.5"
+              >
+                <Brain className="w-3.5 h-3.5" />
+                <span>Credential Quality Report</span>
+              </button>
               <button onClick={() => setActiveModalCred(null)}
                 className="px-4 py-2 rounded-xl btn-ghost text-xs font-semibold border border-white/[0.09]">
                 Close
@@ -1034,6 +1084,28 @@ export default function StudentDashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Modal: Credential Quality Report ───────── */}
+      {qualityModalReport && (
+        <CredentialQualityModal
+          report={qualityModalReport}
+          onClose={() => setQualityModalReport(null)}
+          onOpenCompare={(comp) => {
+            setComparisonModalData(comp);
+          }}
+        />
+      )}
+
+      {/* ── Modal: Side-by-Side Record Comparison ──── */}
+      {comparisonModalData && (
+        <CompareRecordsModal
+          comparison={comparisonModalData}
+          onClose={() => setComparisonModalData(null)}
+          onAcknowledge={() => {
+            loadData();
+          }}
+        />
       )}
     </div>
   );
