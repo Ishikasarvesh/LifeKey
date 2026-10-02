@@ -15,13 +15,16 @@ import {
   Share2, FileText, QrCode, Sparkles, Layers, AlertCircle, Eye, Check,
   X, Lock, ExternalLink, ShieldAlert, Zap, Flame, Brain, Camera,
   ChevronRight, RefreshCw, AlertTriangle, XCircle, Shield, Hash,
-  Fingerprint, ScanLine, Lightbulb, Copy, CheckCheck, Scale
+  Fingerprint, ScanLine, Lightbulb, Copy, CheckCheck, Scale,
+  PlusCircle, Briefcase
 } from "lucide-react";
 import CompareRecordsModal from "@/components/CompareRecordsModal";
 import CredentialQualityModal from "@/components/CredentialQualityModal";
+import TransitionPassportModal from "@/components/TransitionPassportModal";
+import CreatePassportModal from "@/components/CreatePassportModal";
 import { RecordComparison, CredentialQualityReport } from "@/lib/api";
 
-type ActiveTab = "wallet" | "zk" | "burn" | "intel" | "camera";
+type ActiveTab = "wallet" | "passports" | "zk" | "burn" | "intel" | "camera";
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -33,6 +36,12 @@ export default function StudentDashboard() {
   const [burnTokens, setBurnTokens] = useState<BurnTokenOut[]>([]);
   const [intelReport, setIntelReport] = useState<CredentialIntelReport | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Transition Passports state
+  const [passportModalOpen, setPassportModalOpen] = useState(false);
+  const [createPassportOpen, setCreatePassportOpen] = useState(false);
+  const [activePassportStatus, setActivePassportStatus] = useState<"PENDING_APPROVAL" | "APPROVED" | "REJECTED">("PENDING_APPROVAL");
+  const [customPassports, setCustomPassports] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<ActiveTab>("wallet");
 
   // Modal states
@@ -217,6 +226,7 @@ export default function StudentDashboard() {
 
   const TABS: { id: ActiveTab; label: string; icon: React.ReactNode; badge?: number; color: string }[] = [
     { id: "wallet", label: "Credential Wallet", icon: <KeyRound className="w-4 h-4" />, badge: credentials.length, color: "violet" },
+    { id: "passports", label: "Transition Passports", icon: <Briefcase className="w-4 h-4" />, badge: activePassportStatus === "PENDING_APPROVAL" ? 1 : undefined, color: "violet" },
     { id: "zk", label: "ZK Proofs", icon: <Fingerprint className="w-4 h-4" />, badge: zkProofs.length, color: "teal" },
     { id: "burn", label: "Burn Tokens", icon: <Flame className="w-4 h-4" />, badge: burnTokens.filter(b => !b.is_burned).length, color: "coral" },
     { id: "intel", label: "Credential Intel", icon: <Brain className="w-4 h-4" />, badge: intelFlagCount > 0 ? intelFlagCount : undefined, color: "amber" },
@@ -290,53 +300,147 @@ export default function StudentDashboard() {
           </div>
         )}
 
-        {/* ── Life Transition Passport ────────────────── */}
-        {transition && (
-          <div className="mt-7 p-6 sm:p-7 rounded-3xl glass-card bg-white border-[#DCD9FF] shadow-sm relative overflow-hidden animate-fade-up">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 pb-5 border-b border-[#F0EEFF]">
-              <div>
-                <div className="flex items-center gap-2 text-[11px] font-mono text-[#5B5BEF] uppercase font-bold tracking-widest">
-                  <Sparkles className="w-3.5 h-3.5" /> LIFE TRANSITION ENGINE
-                </div>
-                <h2 className="text-2xl font-extrabold text-[#10142F] mt-1">
-                  Passport: <span className="gradient-text-indigo">Student → Employee</span>
-                </h2>
-                <p className="text-sm text-[#69708A] mt-1 max-w-2xl font-normal">
-                  Automated onboarding readiness engine. Correlates your verified credentials for zero-reverification employment entry.
-                </p>
+        {/* ── Transition Passports Suite ───────────────── */}
+        <div className="mt-7 p-6 sm:p-7 rounded-3xl glass-card bg-white border border-[#DCD9FF] shadow-sm relative overflow-hidden animate-fade-up">
+          {/* Top Bar: Title + Create Button */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-[#F0EEFF]">
+            <div>
+              <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase text-[#5B5BEF] font-bold tracking-widest">
+                <Sparkles className="w-3.5 h-3.5 text-[#5B5BEF]" />
+                LIFE EVENT VERIFICATION BUNDLE
               </div>
-              <div className="flex items-center gap-4 bg-[#F7F6FF] p-4 rounded-2xl border border-[#DCD9FF] shrink-0">
-                <div className="text-right">
-                  <div className="text-[11px] text-[#69708A] uppercase font-mono tracking-wider font-bold">Readiness</div>
-                  <div className="text-xl font-black text-[#10142F] mt-0.5">{transition.completed} / {transition.total}</div>
-                  <div className={`text-[11px] font-bold mt-0.5 ${transition.ready ? "text-[#10B981]" : "text-[#D97706]"}`}>
-                    {transition.ready ? "✓ TRANSITION READY" : "In Progress"}
-                  </div>
-                </div>
-                <div className="w-14 h-14 rounded-2xl p-[2px] shadow-sm bg-gradient-to-tr from-[#5B5BEF] to-[#7167F6]">
-                  <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center font-black text-lg text-[#5B5BEF]">
-                    {Math.round((transition.completed / transition.total) * 100)}%
-                  </div>
-                </div>
-              </div>
+              <h2 className="text-2xl font-black text-[#10142F] mt-0.5">
+                Transition Passports
+              </h2>
+              <p className="text-xs text-[#69708A] mt-0.5 font-normal">
+                Prepare verified, minimal information for important life events. Time-limited & consent-controlled.
+              </p>
             </div>
 
-            <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              {transition.requirements.map((req, idx) => (
-                <div key={idx} className={`p-3.5 rounded-2xl border transition-all ${req.met
-                  ? "bg-[#ECFDF5] border-[#A7F3D0] text-[#065F46]"
-                  : "bg-white border-[#DCD9FF] text-[#69708A]"}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono uppercase tracking-widest font-bold">REQ {String(idx + 1).padStart(2, "0")}</span>
-                    {req.met ? <CheckCircle2 className="w-4 h-4 text-[#10B981]" /> : <Clock className="w-4 h-4 text-[#D97706]" />}
+            <button
+              onClick={() => setCreatePassportOpen(true)}
+              className="btn-primary px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md shadow-[#5B5BEF]/20 flex items-center gap-2 shrink-0"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>+ Create Transition Passport</span>
+            </button>
+          </div>
+
+          {/* Active Passport Card */}
+          <div className="mt-5 p-5 rounded-2xl bg-[#FAFAFE] border border-[#DCD9FF] shadow-xs">
+            <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold tracking-wider badge-indigo">
+                  ACTIVE PASSPORT
+                </span>
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                  activePassportStatus === "APPROVED" ? "badge-lime" :
+                  activePassportStatus === "REJECTED" ? "badge-rose" : "badge-amber"
+                }`}>
+                  {activePassportStatus === "APPROVED" ? "✓ Approved & Shared" :
+                   activePassportStatus === "REJECTED" ? "Rejected" : "Awaiting your approval"}
+                </span>
+              </div>
+              <span className="text-[11px] font-mono text-amber-700 font-semibold flex items-center gap-1">
+                <Clock className="w-3 h-3 text-amber-600" /> Expires: Oct 10, 2026
+              </span>
+            </div>
+
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-black text-[#10142F] flex items-center gap-2">
+                  <span>💼 Starting My First Job</span>
+                </h3>
+                <div className="text-xs text-[#69708A] mt-1 space-y-0.5">
+                  <div><strong>Requested by:</strong> TechNova HR</div>
+                  <div><strong>Purpose:</strong> Employment onboarding and identity verification</div>
+                </div>
+
+                <div className="mt-3 flex items-center gap-2 flex-wrap text-xs">
+                  <span className="text-[11px] font-bold text-[#10142F]">Included:</span>
+                  <span className="px-2 py-0.5 rounded-md bg-white border border-[#DCD9FF] text-[#10142F] text-[11px] font-semibold">✓ Identity</span>
+                  <span className="px-2 py-0.5 rounded-md bg-white border border-[#DCD9FF] text-[#10142F] text-[11px] font-semibold">✓ B.Tech Degree</span>
+                  <span className="px-2 py-0.5 rounded-md bg-white border border-[#DCD9FF] text-[#10142F] text-[11px] font-semibold">✓ AI/ML Diploma</span>
+                  <span className="px-2 py-0.5 rounded-md bg-white border border-[#DCD9FF] text-[#10142F] text-[11px] font-semibold">✓ Python Skill Certificate</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => setPassportModalOpen(true)}
+                  className="px-5 py-2.5 rounded-xl btn-primary text-xs font-bold text-white shadow-md shadow-[#5B5BEF]/20 flex items-center gap-1.5"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>{activePassportStatus === "APPROVED" ? "View Shared Passport" : "Review & Approve"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Previous Passports & Custom Passports */}
+          <div className="mt-4 pt-4 border-t border-[#F0EEFF]">
+            <div className="text-xs font-mono uppercase text-[#69708A] font-bold mb-2">Previous Passports</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              <div className="p-3 rounded-xl bg-white border border-[#E8E6FF] flex items-center justify-between text-xs">
+                <div>
+                  <div className="font-bold text-[#10142F]">🎓 University Admission</div>
+                  <div className="text-[10px] text-[#69708A]">D. J. Sanghvi College of Eng.</div>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded badge-lime font-bold">
+                  Completed
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-white border border-[#E8E6FF] flex items-center justify-between text-xs">
+                <div>
+                  <div className="font-bold text-[#10142F]">💼 Internship Verification</div>
+                  <div className="text-[10px] text-[#69708A]">Apex Labs Onboarding</div>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold border border-slate-200">
+                  Expired
+                </span>
+              </div>
+
+              {customPassports.map(p => (
+                <div key={p.id} className="p-3 rounded-xl bg-white border border-[#DCD9FF] flex items-center justify-between text-xs animate-fade-up">
+                  <div>
+                    <div className="font-bold text-[#10142F]">{p.icon} {p.title}</div>
+                    <div className="text-[10px] text-[#69708A]">{p.requestedBy} · {p.expires}</div>
                   </div>
-                  <div className="text-xs font-bold text-[#10142F] leading-snug">{req.name}</div>
-                  <div className="text-[10px] mt-1 font-semibold">{req.met ? "Verified" : "Missing"}</div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded badge-lime font-bold">
+                    Active
+                  </span>
                 </div>
               ))}
             </div>
           </div>
-        )}
+
+          {/* Onboarding Readiness Summary */}
+          {transition && (
+            <div className="mt-5 pt-4 border-t border-[#F0EEFF]">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+                <span className="text-xs font-mono uppercase text-[#69708A] font-bold">
+                  Employment Transition Readiness: {transition.completed}/{transition.total} Requirements Met
+                </span>
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  ✓ 100% TRANSITION READY
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {transition.requirements.map((req, idx) => (
+                  <div key={idx} className="p-2.5 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-xs text-[#065F46] flex items-center justify-between">
+                    <div>
+                      <div className="text-[9.5px] font-mono uppercase font-bold text-[#047857]">REQ 0{idx + 1}</div>
+                      <div className="font-bold text-[#10142F] truncate text-[11px]">{req.name}</div>
+                    </div>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0 ml-1" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* ── Main Grid: Tabs + Consent Panel ──────────── */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -456,6 +560,111 @@ export default function StudentDashboard() {
                     );
                   })
                 )}
+              </div>
+            )}
+
+            {/* ── TAB: Transition Passports ─────────────── */}
+            {activeTab === "passports" && (
+              <div className="space-y-5 animate-fade-up">
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div>
+                    <h3 className="text-lg font-extrabold text-[#10142F] flex items-center gap-2">
+                      <Briefcase className="w-5 h-5 text-[#5B5BEF]" />
+                      <span>Transition Passports</span>
+                    </h3>
+                    <p className="text-xs text-[#69708A] mt-1">
+                      Purpose-specific, minimal verifiable credential packages for employment, education, and life events.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => setCreatePassportOpen(true)}
+                    className="btn-primary px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md shadow-[#5B5BEF]/20 flex items-center gap-2"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>+ New Passport</span>
+                  </button>
+                </div>
+
+                {/* Active Passport in Tab */}
+                <div className="p-5 rounded-3xl glass-card bg-white border border-[#DCD9FF] shadow-sm space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold tracking-wider badge-indigo">
+                      ACTIVE REQUEST
+                    </span>
+                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                      activePassportStatus === "APPROVED" ? "badge-lime" :
+                      activePassportStatus === "REJECTED" ? "badge-rose" : "badge-amber"
+                    }`}>
+                      {activePassportStatus === "APPROVED" ? "✓ Shared with TechNova HR" :
+                       activePassportStatus === "REJECTED" ? "Request Rejected" : "Awaiting Holder Approval"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="text-base font-black text-[#10142F]">💼 Starting My First Job</h4>
+                    <p className="text-xs text-[#69708A] mt-0.5">
+                      Requested by <strong>TechNova HR</strong> · Purpose: Employment onboarding · Expires: Oct 10, 2026
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-[#FAFAFE] border border-[#E8E6FF] text-xs space-y-1.5">
+                    <div className="font-bold text-[#10142F] text-[11px]">Included Proof Package (4 Items):</div>
+                    <div className="grid grid-cols-2 gap-1 text-[11px]">
+                      <span className="text-emerald-700">✓ Citizen Identity</span>
+                      <span className="text-emerald-700">✓ B.Tech Degree</span>
+                      <span className="text-emerald-700">✓ AI/ML Diploma</span>
+                      <span className="text-emerald-700">✓ Python Skill Certificate</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-between">
+                    <span className="text-[10.5px] text-[#69708A]">Protected by LifeKey Minimal Disclosure</span>
+                    <button
+                      onClick={() => setPassportModalOpen(true)}
+                      className="btn-primary px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm flex items-center gap-1.5"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>{activePassportStatus === "APPROVED" ? "View Passport Details" : "Review & Decide"}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Previous Passports */}
+                <div className="space-y-2.5">
+                  <div className="text-xs font-bold text-[#10142F] uppercase tracking-wider">Archived & Completed Passports</div>
+                  <div className="p-4 rounded-2xl bg-white border border-[#E8E6FF] flex items-center justify-between text-xs">
+                    <div>
+                      <div className="font-bold text-[#10142F]">🎓 University Admission</div>
+                      <div className="text-[10.5px] text-[#69708A]">Recipient: D. J. Sanghvi College of Engineering · Completed July 2022</div>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded badge-lime font-bold">
+                      Completed
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white border border-[#E8E6FF] flex items-center justify-between text-xs">
+                    <div>
+                      <div className="font-bold text-[#10142F]">💼 Internship Verification</div>
+                      <div className="text-[10.5px] text-[#69708A]">Recipient: Apex Labs · Expired June 2024</div>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold border border-slate-200">
+                      Expired
+                    </span>
+                  </div>
+
+                  {customPassports.map(p => (
+                    <div key={p.id} className="p-4 rounded-2xl bg-white border border-[#DCD9FF] flex items-center justify-between text-xs animate-fade-up">
+                      <div>
+                        <div className="font-bold text-[#10142F]">{p.icon} {p.title}</div>
+                        <div className="text-[10.5px] text-[#69708A]">Recipient: {p.requestedBy} · Expires: {p.expires}</div>
+                      </div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded badge-lime font-bold">
+                        Active
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -1097,16 +1306,35 @@ export default function StudentDashboard() {
         />
       )}
 
-      {/* ── Modal: Side-by-Side Record Comparison ──── */}
-      {comparisonModalData && (
-        <CompareRecordsModal
-          comparison={comparisonModalData}
-          onClose={() => setComparisonModalData(null)}
-          onAcknowledge={() => {
-            loadData();
-          }}
-        />
-      )}
+      {/* ── Modal: Transition Passport Details (Starting My First Job) ── */}
+      <TransitionPassportModal
+        isOpen={passportModalOpen}
+        onClose={() => setPassportModalOpen(false)}
+        onApprove={() => {
+          setActivePassportStatus("APPROVED");
+          setActionSuccess("Transition Passport for TechNova HR approved and shared!");
+          setPassportModalOpen(false);
+          setTimeout(() => setActionSuccess(null), 6000);
+        }}
+        onReject={() => {
+          setActivePassportStatus("REJECTED");
+          setActionSuccess("Transition Passport request rejected.");
+          setPassportModalOpen(false);
+          setTimeout(() => setActionSuccess(null), 5000);
+        }}
+        status={activePassportStatus}
+      />
+
+      {/* ── Modal: Create Custom Transition Passport ──── */}
+      <CreatePassportModal
+        isOpen={createPassportOpen}
+        onClose={() => setCreatePassportOpen(false)}
+        onCreate={(newPassport) => {
+          setCustomPassports(prev => [newPassport, ...prev]);
+          setActionSuccess(`New Transition Passport "${newPassport.title}" created successfully!`);
+          setTimeout(() => setActionSuccess(null), 6000);
+        }}
+      />
     </div>
   );
 }

@@ -14,6 +14,9 @@ import TamperDemo from "@/components/TamperDemo";
 import RevocationTimeline from "@/components/RevocationTimeline";
 import VerificationHistory from "@/components/VerificationHistory";
 import SmartDigitizerSection from "@/components/SmartDigitizerSection";
+import SecurityArchitectureSection from "@/components/SecurityArchitectureSection";
+import StandardsRoadmapSection from "@/components/StandardsRoadmapSection";
+import BusinessModelSection from "@/components/BusinessModelSection";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 import CompareRecordsModal from "@/components/CompareRecordsModal";
@@ -124,11 +127,20 @@ export default function Home() {
         {/* 13. Smart Camera / Document Digitizer Pipeline */}
         <SmartDigitizerSection />
 
-        {/* 14. Final Call-to-Action */}
+        {/* 14. Decentralized Trust Architecture (6-node chain) */}
+        <SecurityArchitectureSection />
+
+        {/* 15. Standards & Interoperability Roadmap */}
+        <StandardsRoadmapSection />
+
+        {/* 16. Business Model & Phased Development Roadmap */}
+        <BusinessModelSection />
+
+        {/* 17. Final Call-to-Action */}
         <FinalCTA />
       </main>
 
-      {/* 15. Minimal Footer */}
+      {/* 18. Minimal Footer */}
       <Footer />
 
       {/* Modal: Interactive Compare Records / Human Review Signal */}

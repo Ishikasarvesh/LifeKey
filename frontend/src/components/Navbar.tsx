@@ -46,6 +46,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Product", href: "/#product" },
+    { name: "Transitions", href: "/transitions" },
     { name: "How It Works", href: "/#how-it-works" },
     { name: "Security", href: "/#security" },
     { name: "Credential Intelligence", href: "/#intelligence" },
