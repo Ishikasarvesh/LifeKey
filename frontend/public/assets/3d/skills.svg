@@ -1,0 +1,39 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hex-grad" x1="30" y1="20" x2="170" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#F0EEFF" />
+      <stop offset="100%" stop-color="#DCD9FF" />
+    </linearGradient>
+    <linearGradient id="code-grad" x1="60" y1="70" x2="140" y2="130" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5B5BEF" />
+      <stop offset="100%" stop-color="#7167F6" />
+    </linearGradient>
+    <filter id="hex-shadow" x="15" y="15" width="170" height="175" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#5B5BEF" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <g filter="url(#hex-shadow)">
+    <!-- 3D Isometric Hexagon Prism -->
+    <path d="M100 24L165 61V139L100 176L35 139V61L100 24Z" 
+          fill="url(#hex-grad)" stroke="#FFFFFF" stroke-width="2.5" />
+    
+    <!-- Inner Frosted Hexagon Surface -->
+    <path d="M100 38L151 67V125L100 154L49 125V67L100 38Z" 
+          fill="#F7F6FF" stroke="#DCD9FF" stroke-width="1.5" />
+
+    <!-- Code / Skills Symbol: </> with glowing indigo gradient -->
+    <!-- Left Bracket < -->
+    <path d="M82 82L66 100L82 118" stroke="url(#code-grad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Slash / -->
+    <path d="M108 76L92 124" stroke="url(#code-grad)" stroke-width="4.5" stroke-linecap="round" />
+
+    <!-- Right Bracket > -->
+    <path d="M118 82L134 100L118 118" stroke="url(#code-grad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Subtle highlight spark -->
+    <circle cx="100" cy="50" r="3" fill="#5B5BEF" />
+  </g>
+</svg>

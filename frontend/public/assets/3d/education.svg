@@ -1,0 +1,35 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cap-top-grad" x1="20" y1="50" x2="180" y2="130" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#E8E6FF" />
+      <stop offset="100%" stop-color="#5B5BEF" />
+    </linearGradient>
+    <linearGradient id="cap-base-grad" x1="50" y1="100" x2="150" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5B5BEF" />
+      <stop offset="100%" stop-color="#10142F" />
+    </linearGradient>
+    <filter id="cap-shadow" x="15" y="25" width="170" height="155" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#5B5BEF" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <g filter="url(#cap-shadow)">
+    <!-- Cap Skull Base -->
+    <path d="M60 102V124C60 144 78 156 100 156C122 156 140 144 140 124V102C128 110 114 114 100 114C86 114 72 110 60 102Z" 
+          fill="url(#cap-base-grad)" stroke="#DCD9FF" stroke-width="1.5" />
+
+    <!-- Diamond Mortarboard Top -->
+    <path d="M100 42L176 80L100 118L24 80L100 42Z" 
+          fill="url(#cap-top-grad)" stroke="#FFFFFF" stroke-width="2" />
+
+    <!-- Center Button -->
+    <ellipse cx="100" cy="80" rx="8" ry="4" fill="#FFFFFF" />
+    <ellipse cx="100" cy="80" rx="4" ry="2" fill="#5B5BEF" />
+
+    <!-- Tassel Ribbon & Bobble -->
+    <path d="M100 80C125 82 145 100 148 126" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" fill="none" />
+    <circle cx="148" cy="130" r="5" fill="#F59E0B" />
+    <path d="M145 133L143 148M148 135L148 150M151 133L153 148" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" />
+  </g>
+</svg>

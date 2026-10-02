@@ -228,6 +228,36 @@ export const getUser = (): User | null => {
   return null;
 };
 
+// ─── Demo Accounts Configuration (Single Source of Truth) ─
+export const DEMO_ACCOUNTS = {
+  STUDENT: {
+    role: "STUDENT" as const,
+    label: "Student",
+    name: "Parth Patil",
+    email: "parth@lifekey.id",
+    password: "password123",
+    dashboardPath: "/dashboard/student",
+  },
+  INSTITUTION: {
+    role: "INSTITUTION" as const,
+    label: "Institution",
+    name: "Dr. Arvind Sharma",
+    organization: "ABC Polytechnic Institute",
+    email: "admin@abcpoly.edu.in",
+    password: "password123",
+    dashboardPath: "/dashboard/institution",
+  },
+  EMPLOYER: {
+    role: "EMPLOYER" as const,
+    label: "Employer",
+    name: "Priya Nair",
+    organization: "TechNova Pvt Ltd",
+    email: "hr@technova.com",
+    password: "password123",
+    dashboardPath: "/dashboard/employer",
+  },
+};
+
 // ─── Generic Fetcher ──────────────────────────────────────
 
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -238,11 +268,26 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+  } catch (err: any) {
+    // Network-level error: backend down, connection refused, DNS error, or CORS block
+    throw new Error("Cannot connect to LIFEKEY API. Please start the FastAPI server.");
+  }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ detail: "Request failed" }));
-    throw new Error(errorData.detail || `HTTP Error ${response.status}`);
+    if (response.status === 401) {
+      throw new Error("Invalid email or password.");
+    }
+    if (response.status === 422) {
+      throw new Error("Invalid login request.");
+    }
+    if (response.status >= 500) {
+      throw new Error("LIFEKEY API encountered an internal error.");
+    }
+    const errorData = await response.json().catch(() => ({ detail: null }));
+    throw new Error(errorData.detail || `Request failed (${response.status})`);
   }
   return response.json();
 }

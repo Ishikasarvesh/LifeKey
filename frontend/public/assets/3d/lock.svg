@@ -1,0 +1,42 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shackle-grad" x1="60" y1="20" x2="140" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#DCD9FF" />
+      <stop offset="100%" stop-color="#7167F6" />
+    </linearGradient>
+    <linearGradient id="lock-body-grad" x1="40" y1="80" x2="160" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="50%" stop-color="#F7F6FF" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#E8E6FF" stop-opacity="0.8" />
+    </linearGradient>
+    <filter id="lock-shadow" x="20" y="10" width="160" height="185" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#5B5BEF" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <!-- Ambient light -->
+  <circle cx="100" cy="110" r="65" fill="#F0EEFF" filter="blur(20px)" />
+
+  <g filter="url(#lock-shadow)">
+    <!-- Shackle -->
+    <path d="M68 96V64C68 46.3 82.3 32 100 32C117.7 32 132 46.3 132 64V96" 
+          stroke="url(#shackle-grad)" stroke-width="14" stroke-linecap="round" fill="none" />
+
+    <!-- Lock Body -->
+    <rect x="46" y="86" width="108" height="92" rx="24" fill="url(#lock-body-grad)" stroke="#DCD9FF" stroke-width="2" />
+
+    <!-- Frosted Bevel Inner Card -->
+    <rect x="56" y="96" width="88" height="72" rx="16" fill="#FFFFFF" fill-opacity="0.5" stroke="#E8E6FF" stroke-width="1" />
+
+    <!-- Keyhole -->
+    <circle cx="100" cy="126" r="8" fill="#5B5BEF" />
+    <path d="M96 128L94 144H106L104 128Z" fill="#5B5BEF" />
+
+    <!-- Glow inside keyhole -->
+    <circle cx="100" cy="126" r="3" fill="#FFFFFF" />
+
+    <!-- Rim highlight -->
+    <path d="M52 104C52 94 60 88 72 88" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+</svg>

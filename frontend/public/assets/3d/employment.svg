@@ -1,0 +1,40 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="case-body-grad" x1="30" y1="60" x2="170" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#F0EEFF" />
+      <stop offset="100%" stop-color="#DCD9FF" />
+    </linearGradient>
+    <linearGradient id="latch-grad" x1="0" y1="0" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5B5BEF" />
+      <stop offset="100%" stop-color="#7167F6" />
+    </linearGradient>
+    <filter id="case-shadow" x="15" y="25" width="170" height="155" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#5B5BEF" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <g filter="url(#case-shadow)">
+    <!-- Briefcase Handle -->
+    <path d="M80 65V44C80 39.5 83.5 36 88 36H112C116.5 36 120 39.5 120 44V65" 
+          stroke="#5B5BEF" stroke-width="7" stroke-linecap="round" fill="none" />
+
+    <!-- Briefcase Main Body -->
+    <rect x="30" y="65" width="140" height="100" rx="20" fill="url(#case-body-grad)" stroke="#FFFFFF" stroke-width="2.5" />
+
+    <!-- Inner Flap Divider -->
+    <path d="M30 102H170" stroke="#DCD9FF" stroke-width="2" />
+    <path d="M30 65L75 102H125L170 65" fill="#FFFFFF" fill-opacity="0.5" />
+
+    <!-- Dual Cryptographic Latches -->
+    <rect x="62" y="96" width="14" height="18" rx="4" fill="url(#latch-grad)" />
+    <rect x="124" y="96" width="14" height="18" rx="4" fill="url(#latch-grad)" />
+    
+    <!-- Latch keypins -->
+    <circle cx="69" cy="105" r="2" fill="#FFFFFF" />
+    <circle cx="131" cy="105" r="2" fill="#FFFFFF" />
+
+    <!-- Frosted gloss highlight -->
+    <path d="M38 78C38 72 44 68 52 68H148" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+</svg>

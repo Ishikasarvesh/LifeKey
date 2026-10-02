@@ -1,0 +1,49 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="qr-card-grad" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="50%" stop-color="#F7F6FF" />
+      <stop offset="100%" stop-color="#E8E6FF" />
+    </linearGradient>
+    <linearGradient id="beam-grad" x1="30" y1="0" x2="170" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5B5BEF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#5B5BEF" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#5B5BEF" stop-opacity="0" />
+    </linearGradient>
+    <filter id="qr-shadow" x="15" y="15" width="170" height="175" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#5B5BEF" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <g filter="url(#qr-shadow)">
+    <!-- Main Card Body -->
+    <rect x="25" y="25" width="150" height="150" rx="28" fill="url(#qr-card-grad)" stroke="#DCD9FF" stroke-width="2" />
+
+    <!-- Corner Target 1 (Top Left) -->
+    <rect x="45" y="45" width="34" height="34" rx="8" fill="none" stroke="#5B5BEF" stroke-width="4" />
+    <rect x="53" y="53" width="18" height="18" rx="4" fill="#5B5BEF" />
+
+    <!-- Corner Target 2 (Top Right) -->
+    <rect x="121" y="45" width="34" height="34" rx="8" fill="none" stroke="#5B5BEF" stroke-width="4" />
+    <rect x="129" y="53" width="18" height="18" rx="4" fill="#5B5BEF" />
+
+    <!-- Corner Target 3 (Bottom Left) -->
+    <rect x="45" y="121" width="34" height="34" rx="8" fill="none" stroke="#5B5BEF" stroke-width="4" />
+    <rect x="53" y="129" width="18" height="18" rx="4" fill="#5B5BEF" />
+
+    <!-- Central Data Pixels -->
+    <rect x="92" y="45" width="16" height="16" rx="3" fill="#10142F" />
+    <rect x="92" y="68" width="16" height="16" rx="3" fill="#7167F6" />
+    <rect x="68" y="92" width="16" height="16" rx="3" fill="#10142F" />
+    <rect x="92" y="92" width="16" height="16" rx="3" fill="#10B981" />
+    <rect x="116" y="92" width="16" height="16" rx="3" fill="#10142F" />
+    <rect x="139" y="92" width="16" height="16" rx="3" fill="#7167F6" />
+    <rect x="92" y="116" width="16" height="16" rx="3" fill="#10142F" />
+    <rect x="116" y="116" width="16" height="16" rx="3" fill="#5B5BEF" />
+    <rect x="116" y="139" width="16" height="16" rx="3" fill="#10142F" />
+    <rect x="139" y="139" width="16" height="16" rx="3" fill="#10142F" />
+
+    <!-- Scanning beam line across QR -->
+    <rect x="30" y="98" width="140" height="3" fill="url(#beam-grad)" />
+  </g>
+</svg>

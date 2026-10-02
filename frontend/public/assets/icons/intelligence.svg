@@ -1,0 +1,9 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" rx="14" fill="#F0EEFF" />
+  <!-- Brain / Neural Conflict Analysis Icon -->
+  <path d="M19 18C17 18 15 19.5 15 22C15 23 15.5 24 16.5 24.5C15.5 25.5 15 27 15 28.5C15 31 17 33 19.5 33H20M29 18C31 18 33 19.5 33 22C33 23 32.5 24 31.5 24.5C32.5 25.5 33 27 33 28.5C33 31 31 33 28.5 33H28" stroke="#5B5BEF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M24 15V33M20 23H24M24 28H28" stroke="#7167F6" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="24" cy="15" r="2" fill="#5B5BEF"/>
+  <circle cx="20" cy="23" r="2" fill="#7167F6"/>
+  <circle cx="28" cy="28" r="2" fill="#7167F6"/>
+</svg>

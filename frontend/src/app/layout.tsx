@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -15,8 +9,22 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LIFEKEY — Citizen-Controlled Verifiable Identity & Transition Layer",
-  description: "One trusted identity. Every life-stage transition. W3C Verifiable Credentials interoperability layer connecting Education → Employment → Finance → Healthcare.",
+  title: "LifeKey — Unified Life-Stage Digital Identity & Record Network",
+  description: "User-controlled digital credential and record network designed around life-stage transitions. Issue, Own, Share, and Verify degrees, certificates, and employment records with cryptographic integrity and cross-record intelligence.",
+  keywords: [
+    "LifeKey",
+    "Digital Identity",
+    "Verifiable Credentials",
+    "Credential Intelligence",
+    "Life-Stage Network",
+    "Selective Disclosure",
+    "QR Verification",
+    "RSA-PSS",
+    "SHA-256",
+  ],
+  icons: {
+    icon: "/assets/brand/lifekey-mark.svg",
+  },
 };
 
 export default function RootLayout({
@@ -27,9 +35,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
+      className={`${jetbrainsMono.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col bg-[#06050f] text-[#e2e0f0] selection:bg-violet-700 selection:text-white">
+      <body className="min-h-full flex flex-col bg-white text-[#11152E] selection:bg-[#5B5BEF] selection:text-white">
         {children}
       </body>
     </html>

@@ -322,37 +322,40 @@ export default function InstitutionDashboard() {
   const flagCount = intelReport?.flags?.length || 0;
 
   return (
-    <div className="min-h-screen bg-[#06050f] text-[#e2e0f0] flex flex-col selection:bg-violet-700 selection:text-white">
+    <div className="min-h-screen bg-[#F7F8FC] text-[#11152E] flex flex-col selection:bg-[#5B5BEF] selection:text-white relative overflow-hidden">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Soft Ambient Glow Orbs */}
+      <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-[#E8E6FF]/50 rounded-full blur-[140px] pointer-events-none" />
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Top Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-[#DCD9FF]">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-mono uppercase px-2.5 py-0.5 rounded badge-violet font-bold tracking-wider">
+              <span className="text-[11px] font-mono uppercase px-3 py-1 rounded-full badge-indigo font-bold tracking-wider">
                 ACCREDITED ISSUER NODE
               </span>
-              <span className="text-[11px] text-[#7c78a0] font-mono">
-                {user?.organization || "Academic Authority"}
+              <span className="text-xs text-[#69708A] font-semibold">
+                {user?.organization || "ABC Polytechnic Institute"}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white mt-1">
-              Institution <span className="gradient-text-violet">Credential Center</span>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#10142F] tracking-tight mt-1.5">
+              Institution <span className="gradient-text-indigo">Credential Center</span>
             </h1>
-            <p className="text-sm text-[#8d8aab] mt-1">
+            <p className="text-sm text-[#69708A] mt-1 font-normal">
               Issue W3C Verifiable Credentials with RSA-2048 signatures, manage instant revocation, and run automated Credential Intelligence.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.07] text-xs font-mono text-teal-300 flex items-center gap-1.5 shadow-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              RSA-2048 Active Key
+            <div className="px-4 py-2 rounded-2xl bg-white border border-[#DCD9FF] text-xs font-bold text-[#10142F] flex items-center gap-2 shadow-sm">
+              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
+              <span>✓ RSA-2048 Active Key</span>
             </div>
             <button
               onClick={() => { loadData(); loadIntel(); }}
-              className="p-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-[#8d8aab] hover:text-white border border-white/[0.07] transition-all"
+              className="p-2.5 rounded-2xl bg-white hover:bg-[#F0EEFF] text-[#69708A] hover:text-[#10142F] border border-[#DCD9FF] shadow-sm transition-all"
               title="Refresh Registry"
             >
               <RefreshCw className="w-4 h-4" />
@@ -361,46 +364,48 @@ export default function InstitutionDashboard() {
         </div>
 
         {issueSuccess && (
-          <div className="mt-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-sm flex items-center gap-2 animate-fade-up">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-            <span>{issueSuccess}</span>
+          <div className="mt-4 p-4 rounded-2xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] text-sm flex items-center gap-2 shadow-sm animate-fade-up">
+            <CheckCircle2 className="w-5 h-5 text-[#10B981] shrink-0" />
+            <span className="font-semibold">{issueSuccess}</span>
           </div>
         )}
 
         {/* Tab Controls */}
-        <div className="mt-6 flex items-center gap-2 border-b border-white/[0.08] pb-3">
+        <div className="mt-6 flex items-center gap-2 border-b border-[#DCD9FF] pb-4">
           <button
             onClick={() => setActiveTab("registry")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === "registry"
-                ? "btn-violet text-white shadow-lg"
-                : "bg-white/[0.03] text-[#7c78a0] border border-white/[0.06] hover:text-white"
+                ? "btn-primary shadow-md"
+                : "bg-white text-[#69708A] border border-[#DCD9FF] hover:bg-[#F0EEFF] hover:text-[#10142F]"
             }`}
           >
             <Layers className="w-4 h-4" />
             <span>Registry & Issuance</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+              activeTab === "registry" ? "bg-white/20 text-white" : "bg-[#F0EEFF] text-[#5B5BEF]"
+            }`}>
               {issuedCreds.length}
             </span>
           </button>
 
           <button
             onClick={() => { setActiveTab("intel"); loadIntel(); }}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === "intel"
-                ? "btn-teal text-white shadow-lg"
-                : "bg-white/[0.03] text-[#7c78a0] border border-white/[0.06] hover:text-white"
+                ? "btn-primary shadow-md"
+                : "bg-white text-[#69708A] border border-[#DCD9FF] hover:bg-[#F0EEFF] hover:text-[#10142F]"
             }`}
           >
-            <Brain className="w-4 h-4 text-teal-400" />
+            <Brain className="w-4 h-4 text-[#5B5BEF]" />
             <span>Credential Intelligence QA</span>
             {flagCount > 0 ? (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/80 text-white animate-pulse">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FEF2F2] text-[#EF4444] border border-[#FECACA]">
                 {flagCount} Flags
               </span>
             ) : (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/30 text-emerald-300">
-                100% QA
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ECFDF5] text-[#10B981] border border-[#A7F3D0]">
+                100% QA Clean
               </span>
             )}
           </button>
@@ -409,16 +414,18 @@ export default function InstitutionDashboard() {
         {/* TAB 1: REGISTRY & ISSUANCE */}
         {activeTab === "registry" && (
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-up">
-            {/* Left Column: Issue Verifiable Credential Form */}
+            {/* Left Column: Issue Verifiable Credential Form (Blue/Indigo Accented Card) */}
             <div className="lg:col-span-5">
-              <div className="glass-panel-glow rounded-3xl p-6 border border-violet-500/25">
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-white/[0.08]">
-                  <PlusCircle className="w-5 h-5 text-violet-400" />
+              <div className="glass-card p-6 sm:p-7 border-[#DCD9FF] shadow-lg relative bg-white">
+                <div className="flex items-center gap-3 mb-5 pb-4 border-b border-[#F0EEFF]">
+                  <div className="w-10 h-10 rounded-2xl bg-[#F0EEFF] border border-[#DCD9FF] flex items-center justify-center text-[#5B5BEF] shadow-sm">
+                    <PlusCircle className="w-5 h-5" />
+                  </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">
+                    <h3 className="text-xl font-extrabold text-[#10142F]">
                       Issue Verifiable Credential
                     </h3>
-                    <p className="text-[11px] text-[#7c78a0]">
+                    <p className="text-xs text-[#69708A]">
                       Signs directly to candidate wallet with W3C JSON-LD spec
                     </p>
                   </div>
@@ -426,13 +433,13 @@ export default function InstitutionDashboard() {
 
                 <form onSubmit={handleIssue} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                    <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">
                       Student Recipient
                     </label>
                     <select
                       value={studentEmail}
                       onChange={(e) => setStudentEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm bg-[#0a1020]"
+                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]"
                     >
                       {students.length > 0 ? (
                         students.map((s) => (
@@ -447,7 +454,7 @@ export default function InstitutionDashboard() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                    <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">
                       Credential Type
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -458,8 +465,8 @@ export default function InstitutionDashboard() {
                           onClick={() => setCredType(t)}
                           className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border ${
                             credType === t
-                              ? "btn-violet text-white"
-                              : "bg-white/[0.03] text-[#7c78a0] border-white/[0.08] hover:text-white"
+                              ? "bg-[#5B5BEF] text-white border-[#5B5BEF] shadow-sm"
+                              : "bg-white text-[#69708A] border-[#DCD9FF] hover:bg-[#F0EEFF] hover:text-[#10142F]"
                           }`}
                         >
                           {t}
@@ -469,7 +476,7 @@ export default function InstitutionDashboard() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                    <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">
                       Award Title
                     </label>
                     <input
@@ -478,14 +485,14 @@ export default function InstitutionDashboard() {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="e.g. Diploma in Artificial Intelligence"
-                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm"
+                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]"
                     />
                   </div>
 
                   {(credType === "DIPLOMA" || credType === "DEGREE") && (
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-300 mb-1">
+                        <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">
                           Major / Discipline
                         </label>
                         <input
@@ -493,11 +500,11 @@ export default function InstitutionDashboard() {
                           value={major}
                           onChange={(e) => setMajor(e.target.value)}
                           placeholder="e.g. Computer Science & AI"
-                          className="w-full px-3 py-2 rounded-xl glass-input text-xs sm:text-sm"
+                          className="w-full px-3 py-2 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-300 mb-1">
+                        <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">
                           CGPA (Scale 10.0)
                         </label>
                         <input
@@ -505,45 +512,45 @@ export default function InstitutionDashboard() {
                           value={cgpa}
                           onChange={(e) => setCgpa(e.target.value)}
                           placeholder="e.g. 8.85"
-                          className="w-full px-3 py-2 rounded-xl glass-input text-xs sm:text-sm"
+                          className="w-full px-3 py-2 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]"
                         />
                       </div>
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1">
-                      Verified Competencies & Skills (Comma-separated)
+                    <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">
+                      Verified Competencies & Skills
                     </label>
                     <input
                       type="text"
                       value={skills}
                       onChange={(e) => setSkills(e.target.value)}
                       placeholder="Python, Machine Learning, React, SQL"
-                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm"
+                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1">
+                    <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">
                       Graduation / Award Year
                     </label>
                     <input
                       type="text"
                       value={graduationYear}
                       onChange={(e) => setGraduationYear(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm"
+                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]"
                     />
                   </div>
 
-                  <div className="p-3 rounded-xl bg-violet-500/10 border border-violet-500/20 text-[11px] text-violet-200">
+                  <div className="p-3.5 rounded-2xl bg-[#F0EEFF] border border-[#DCD9FF] text-xs text-[#5B5BEF] leading-relaxed">
                     <span className="font-bold">Cryptographic Action:</span> Clicking &ldquo;Sign & Issue&rdquo; computes a SHA-256 canonical hash of the claims and attaches an RSA-2048 PSS signature directly to the student&apos;s vault.
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 px-4 rounded-xl btn-violet text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="btn-primary w-full py-3.5 text-sm font-bold shadow-lg disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -559,36 +566,36 @@ export default function InstitutionDashboard() {
             </div>
 
             {/* Right Column: Issued Credentials Registry & Revocation Controls */}
-            <div className="lg:col-span-7 space-y-6">
+            <div className="lg:col-span-7 space-y-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Layers className="w-5 h-5 text-violet-400" />
-                    Issued Credentials Registry
+                  <h3 className="text-xl font-extrabold text-[#10142F] flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-[#5B5BEF]" />
+                    <span>Issued Credentials Registry</span>
                   </h3>
-                  <p className="text-xs text-[#8d8aab]">
+                  <p className="text-xs text-[#69708A]">
                     Cryptographic ledger of all awards issued by {user?.organization || "this institution"}.
                   </p>
                 </div>
-                <span className="text-[11px] font-mono px-2.5 py-1 rounded-full badge-violet">
+                <span className="text-[11px] font-mono px-3 py-1 rounded-full badge-indigo font-bold">
                   {issuedCreds.length} Records
                 </span>
               </div>
 
               {loading ? (
-                <div className="p-12 text-center text-gray-400 text-sm glass-panel rounded-2xl">
+                <div className="p-12 text-center text-[#69708A] text-sm glass-card rounded-2xl bg-white border-[#DCD9FF]">
                   Loading registry...
                 </div>
               ) : issuedCreds.length === 0 ? (
-                <div className="p-10 text-center glass-panel rounded-2xl border border-white/[0.08]">
-                  <Building2 className="w-10 h-10 text-gray-500 mx-auto mb-2" />
-                  <h4 className="text-base font-bold text-white">No Credentials Issued Yet</h4>
-                  <p className="text-xs text-gray-400 mt-1">
+                <div className="p-10 text-center glass-card rounded-2xl border-[#DCD9FF] bg-white">
+                  <Building2 className="w-10 h-10 text-[#69708A] mx-auto mb-2" />
+                  <h4 className="text-base font-bold text-[#10142F]">No Credentials Issued Yet</h4>
+                  <p className="text-xs text-[#69708A] mt-1">
                     Use the issuance form on the left to sign your first student credential.
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   {issuedCreds.map((cred) => {
                     const data = cred.credential_data;
                     const isRevoked = cred.status === "REVOKED";
@@ -596,29 +603,29 @@ export default function InstitutionDashboard() {
                     return (
                       <div
                         key={cred.id}
-                        className={`p-5 rounded-2xl glass-panel border transition-all ${
+                        className={`p-5 rounded-2xl glass-card bg-white border transition-all ${
                           isRevoked 
-                            ? "border-rose-500/30 bg-rose-500/[0.03]" 
-                            : "border-white/[0.08] hover:border-violet-500/40"
+                            ? "border-[#FECACA] bg-[#FEF2F2]/30" 
+                            : "border-[#DCD9FF] hover:border-[#5B5BEF]/50 shadow-sm"
                         }`}
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded badge-violet font-bold">
+                              <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded badge-indigo font-bold">
                                 {cred.credential_type}
                               </span>
-                              <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                              <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded font-bold ${
                                 !isRevoked ? "badge-lime" : "badge-rose"
                               }`}>
                                 {cred.status}
                               </span>
                             </div>
-                            <h4 className="text-base font-bold text-white mt-1">
+                            <h4 className="text-base font-bold text-[#10142F] mt-1.5">
                               {data.title || "Academic Credential"}
                             </h4>
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              Holder: <strong className="text-gray-200">{cred.holder_name || "Student"}</strong>
+                            <p className="text-xs text-[#69708A] mt-0.5">
+                              Holder: <strong className="text-[#10142F]">{cred.holder_name || "Student"}</strong>
                             </p>
                           </div>
 
@@ -626,18 +633,18 @@ export default function InstitutionDashboard() {
                             {!isRevoked ? (
                               <button
                                 onClick={() => setRevokingCredId(cred.id)}
-                                className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-all flex items-center gap-1.5"
+                                className="px-3.5 py-1.5 rounded-xl bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#EF4444] border border-[#FECACA] text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
                               >
                                 <AlertTriangle className="w-3.5 h-3.5" />
-                                Revoke Award
+                                <span>Revoke Award</span>
                               </button>
                             ) : (
                               <button
                                 onClick={() => handleReinstate(cred.id)}
-                                className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition-all flex items-center gap-1.5"
+                                className="px-3.5 py-1.5 rounded-xl bg-[#ECFDF5] hover:bg-[#D1FAE5] text-[#10B981] border border-[#A7F3D0] text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
                               >
                                 <RotateCcw className="w-3.5 h-3.5" />
-                                Reinstate
+                                <span>Reinstate</span>
                               </button>
                             )}
                           </div>
@@ -645,13 +652,13 @@ export default function InstitutionDashboard() {
 
                         {/* Revocation Notice */}
                         {isRevoked && (
-                          <div className="mt-3 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300">
+                          <div className="mt-3 p-3 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-xs text-[#DC2626]">
                             <strong>Revocation Reason:</strong> {cred.revocation_reason || "Revoked by Institution"}
                           </div>
                         )}
 
                         {/* Hash snippet */}
-                        <div className="mt-3 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-gray-400">
+                        <div className="mt-3 pt-3 border-t border-[#F0EEFF] flex items-center justify-between text-[11px] font-mono text-[#69708A]">
                           <div className="truncate max-w-sm">
                             SHA-256: {cred.credential_hash}
                           </div>
@@ -670,36 +677,36 @@ export default function InstitutionDashboard() {
         {activeTab === "intel" && (
           <div className="mt-6 space-y-6 animate-fade-up">
             {/* Top Score Banner */}
-            <div className="glass-panel-teal rounded-3xl p-6 border border-teal-500/30">
+            <div className="glass-card rounded-3xl p-6 sm:p-7 border-[#DCD9FF] bg-white shadow-sm">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-teal-400">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-[#F0EEFF] border border-[#DCD9FF] flex items-center justify-center text-[#5B5BEF] shadow-sm">
                     <Brain className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white">
+                    <h3 className="text-xl font-extrabold text-[#10142F]">
                       Automated Credential Intelligence & Duplicate QA
                     </h3>
-                    <p className="text-xs text-[#8d8aab]">
+                    <p className="text-xs text-[#69708A] mt-0.5">
                       Continuous background analysis for duplicate degrees, conflicting dates, and schema anomalies.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 bg-[#0a0a1a]/60 px-5 py-3 rounded-2xl border border-white/[0.08]">
+                <div className="flex items-center gap-4 bg-[#F7F6FF] px-5 py-3 rounded-2xl border border-[#DCD9FF]">
                   <div className="text-right">
-                    <span className="text-[10px] font-mono uppercase text-[#7c78a0] block">QA Cleanliness Score</span>
+                    <span className="text-[10px] font-mono uppercase text-[#69708A] font-bold block">QA Cleanliness Score</span>
                     <span className={`text-2xl font-black font-mono ${
-                      (intelReport?.quality_score ?? 100) >= 90 ? "text-emerald-400" :
-                      (intelReport?.quality_score ?? 100) >= 70 ? "text-amber-400" : "text-rose-400"
+                      (intelReport?.quality_score ?? 100) >= 90 ? "text-[#10B981]" :
+                      (intelReport?.quality_score ?? 100) >= 70 ? "text-[#F59E0B]" : "text-[#EF4444]"
                     }`}>
                       {intelReport?.quality_score ?? 100}%
                     </span>
                   </div>
-                  <div className="h-8 w-px bg-white/10" />
+                  <div className="h-8 w-px bg-[#DCD9FF]" />
                   <div className="text-left">
-                    <span className="text-[10px] font-mono uppercase text-[#7c78a0] block">Active Flags</span>
-                    <span className="text-2xl font-black font-mono text-white">
+                    <span className="text-[10px] font-mono uppercase text-[#69708A] font-bold block">Active Flags</span>
+                    <span className="text-2xl font-black font-mono text-[#10142F]">
                       {flagCount}
                     </span>
                   </div>
@@ -707,35 +714,37 @@ export default function InstitutionDashboard() {
               </div>
 
               {/* Summary Badges */}
-              <div className="mt-6 pt-4 border-t border-white/[0.08] flex flex-wrap items-center gap-3 text-xs">
-                <span className="text-[#8d8aab] font-medium">Issue Breakdown:</span>
+              <div className="mt-6 pt-4 border-t border-[#F0EEFF] flex flex-wrap items-center gap-3 text-xs">
+                <span className="text-[#69708A] font-bold">Issue Breakdown:</span>
                 {intelReport?.summary && Object.keys(intelReport.summary).length > 0 ? (
                   Object.entries(intelReport.summary).map(([k, v]) => (
-                    <span key={k} className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-gray-300 font-mono">
-                      {k}: <strong className="text-teal-300">{v}</strong>
+                    <span key={k} className="px-3 py-1 rounded-xl bg-white border border-[#DCD9FF] text-[#10142F] font-mono shadow-sm">
+                      {k}: <strong className="text-[#5B5BEF]">{v}</strong>
                     </span>
                   ))
                 ) : (
-                  <span className="text-emerald-400 font-mono">Zero structural issues detected</span>
+                  <span className="text-[#10B981] font-mono font-bold">✓ Zero structural issues detected</span>
                 )}
               </div>
             </div>
 
             {/* Scenario Testing Lab */}
-            <div className="p-6 rounded-3xl glass-panel border border-violet-500/25">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
-                <div className="flex items-center gap-2">
-                  <FlaskConical className="w-5 h-5 text-violet-400" />
+            <div className="p-6 rounded-3xl glass-card bg-white border-[#DCD9FF] shadow-sm">
+              <div className="flex items-center justify-between pb-3 border-b border-[#F0EEFF] mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[#F0EEFF] border border-[#DCD9FF] flex items-center justify-center text-[#5B5BEF]">
+                    <FlaskConical className="w-4 h-4" />
+                  </div>
                   <div>
-                    <h4 className="text-base font-bold text-white">
+                    <h4 className="text-base font-bold text-[#10142F]">
                       Live Scenario Testing Lab
                     </h4>
-                    <p className="text-xs text-[#7c78a0]">
+                    <p className="text-xs text-[#69708A]">
                       Run pre-configured test cases (Scenarios A through H) through the Credential Intelligence engine.
                     </p>
                   </div>
                 </div>
-                <span className="text-[10px] font-mono uppercase px-2.5 py-1 rounded badge-violet font-bold">
+                <span className="text-[10px] font-mono uppercase px-2.5 py-1 rounded badge-indigo font-bold">
                   8 TEST SCENARIOS
                 </span>
               </div>
@@ -744,7 +753,7 @@ export default function InstitutionDashboard() {
                 {[
                   { key: "A", label: "A. Perfect Credential", desc: "No issues, 100% QA score", badge: "badge-lime" },
                   { key: "B", label: "B. Exact Duplicate", desc: "Matches canonical record", badge: "badge-amber" },
-                  { key: "C", label: "C. Similar Credential", desc: "B.Tech IT vs B.Tech AIML", badge: "badge-violet" },
+                  { key: "C", label: "C. Similar Credential", desc: "B.Tech IT vs B.Tech AIML", badge: "badge-indigo" },
                   { key: "D", label: "D. Conflicting Year", desc: "2024 vs 2026 mismatch", badge: "badge-rose" },
                   { key: "E", label: "E. Missing Field", desc: "Omitted graduation year", badge: "badge-amber" },
                   { key: "F", label: "F. Expired Credential", desc: "Validity date in past", badge: "badge-rose" },
@@ -755,22 +764,22 @@ export default function InstitutionDashboard() {
                     key={sc.key}
                     onClick={() => handleRunScenarioTest(sc.key)}
                     disabled={testScenarioLoading !== null}
-                    className="p-3.5 rounded-2xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] hover:border-violet-500/40 text-left transition-all group disabled:opacity-50"
+                    className="p-3.5 rounded-2xl bg-white hover:bg-[#F0EEFF] border border-[#DCD9FF] hover:border-[#5B5BEF]/50 text-left transition-all group disabled:opacity-50 shadow-sm"
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${sc.badge}`}>
                         {sc.key}
                       </span>
                       {testScenarioLoading === sc.key ? (
-                        <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        <div className="w-3.5 h-3.5 border-2 border-[#5B5BEF]/20 border-t-[#5B5BEF] rounded-full animate-spin" />
                       ) : (
-                        <Play className="w-3.5 h-3.5 text-gray-500 group-hover:text-violet-400 transition-colors" />
+                        <Play className="w-3.5 h-3.5 text-[#69708A] group-hover:text-[#5B5BEF] transition-colors" />
                       )}
                     </div>
-                    <div className="text-xs font-bold text-white group-hover:text-violet-300 transition-colors">
+                    <div className="text-xs font-bold text-[#10142F] group-hover:text-[#5B5BEF] transition-colors">
                       {sc.label}
                     </div>
-                    <div className="text-[11px] text-[#7c78a0] mt-0.5 line-clamp-1">
+                    <div className="text-[11px] text-[#69708A] mt-0.5 line-clamp-1">
                       {sc.desc}
                     </div>
                   </button>
@@ -780,25 +789,25 @@ export default function InstitutionDashboard() {
 
             {/* Flags List */}
             {intelLoading ? (
-              <div className="p-12 text-center text-gray-400 text-sm glass-panel rounded-2xl">
+              <div className="p-12 text-center text-[#69708A] text-sm glass-card rounded-2xl bg-white border-[#DCD9FF]">
                 Running neural QA checks...
               </div>
             ) : flagCount === 0 ? (
-              <div className="p-12 text-center glass-panel-glow rounded-3xl border border-teal-500/20">
-                <CheckCircle className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-                <h4 className="text-lg font-bold text-white">All Registry Records Cryptographically Clean</h4>
-                <p className="text-xs text-[#8d8aab] max-w-md mx-auto mt-1">
+              <div className="p-12 text-center glass-card rounded-3xl border-[#A7F3D0] bg-[#ECFDF5]/30">
+                <CheckCircle className="w-12 h-12 text-[#10B981] mx-auto mb-3" />
+                <h4 className="text-lg font-bold text-[#10142F]">All Registry Records Cryptographically Clean</h4>
+                <p className="text-xs text-[#69708A] max-w-md mx-auto mt-1">
                   The intelligence engine verified all issued credentials. No duplicate awards, conflicting graduation dates, or missing required fields were found across active students.
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-rose-400" />
-                    Flags Requiring Institutional Review ({flagCount})
+                  <h4 className="text-sm font-bold text-[#10142F] flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-[#EF4444]" />
+                    <span>Flags Requiring Institutional Review ({flagCount})</span>
                   </h4>
-                  <span className="text-xs text-[#7c78a0]">
+                  <span className="text-xs text-[#69708A]">
                     Resolving a flag marks the record as audited
                   </span>
                 </div>
@@ -810,30 +819,30 @@ export default function InstitutionDashboard() {
                   return (
                     <div
                       key={flag.id}
-                      className={`p-5 rounded-2xl glass-panel border transition-all ${
-                        isHigh ? "border-rose-500/35 bg-rose-500/[0.02]" :
-                        isMed ? "border-amber-500/30 bg-amber-500/[0.02]" :
-                        "border-white/[0.08]"
+                      className={`p-5 rounded-2xl glass-card bg-white border transition-all ${
+                        isHigh ? "border-[#FECACA] bg-[#FEF2F2]/20" :
+                        isMed ? "border-[#FDE68A] bg-[#FFFBEB]/20" :
+                        "border-[#DCD9FF]"
                       }`}
                     >
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="space-y-1.5 max-w-2xl">
                           <div className="flex items-center gap-2">
                             <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
-                              isHigh ? "badge-rose" : isMed ? "badge-coral" : "badge-violet"
+                              isHigh ? "badge-rose" : isMed ? "badge-amber" : "badge-indigo"
                             }`}>
                               {flag.flag_type}
                             </span>
-                            <span className="text-[10px] font-mono text-[#7c78a0]">
-                              Severity: <strong className={isHigh ? "text-rose-400" : isMed ? "text-amber-400" : "text-violet-400"}>{flag.severity}</strong>
+                            <span className="text-[10px] font-mono text-[#69708A]">
+                              Severity: <strong className={isHigh ? "text-[#EF4444]" : isMed ? "text-[#F59E0B]" : "text-[#5B5BEF]"}>{flag.severity}</strong>
                             </span>
                           </div>
 
-                          <p className="text-sm font-medium text-white">
+                          <p className="text-sm font-semibold text-[#10142F]">
                             {flag.description}
                           </p>
 
-                          <div className="text-[11px] font-mono text-[#7c78a0] flex items-center gap-3">
+                          <div className="text-[11px] font-mono text-[#69708A] flex items-center gap-3">
                             <span>Detected: {new Date(flag.created_at).toLocaleString()}</span>
                             <span>Record ID: {flag.credential_id_a.slice(0, 8)}...</span>
                           </div>
@@ -844,7 +853,7 @@ export default function InstitutionDashboard() {
                             <button
                               onClick={() => handleOpenCompare(flag.credential_id_a, flag.credential_id_b!)}
                               disabled={comparingLoading}
-                              className="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all flex items-center gap-1.5"
+                              className="px-3.5 py-2 rounded-xl bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
                             >
                               <Scale className="w-3.5 h-3.5" />
                               <span>Compare Records</span>
@@ -854,7 +863,7 @@ export default function InstitutionDashboard() {
                           <button
                             onClick={() => handleResolveFlag(flag.id)}
                             disabled={resolvingFlagId === flag.id}
-                            className="px-4 py-2 rounded-xl btn-teal text-white text-xs font-bold flex items-center gap-1.5 disabled:opacity-50"
+                            className="px-4 py-2 rounded-xl btn-primary text-xs font-bold flex items-center gap-1.5 disabled:opacity-50 shadow-sm"
                           >
                             {resolvingFlagId === flag.id ? (
                               <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -877,27 +886,27 @@ export default function InstitutionDashboard() {
 
         {/* Modal: Revocation Confirmation */}
         {revokingCredId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="max-w-md w-full glass-panel-glow rounded-3xl p-6 border border-rose-500/40 text-left">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-                <h3 className="text-base font-bold text-rose-400 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-rose-400" />
-                  Revoke Verifiable Credential
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+            <div className="max-w-md w-full glass-card bg-white rounded-3xl p-6 border-[#FECACA] text-left shadow-2xl animate-fade-up">
+              <div className="flex items-center justify-between pb-3 border-b border-[#F0EEFF]">
+                <h3 className="text-base font-bold text-[#DC2626] flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-[#EF4444]" />
+                  <span>Revoke Verifiable Credential</span>
                 </h3>
                 <button
                   onClick={() => setRevokingCredId(null)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-white"
+                  className="p-1 rounded-lg text-[#69708A] hover:text-[#10142F]"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <p className="text-xs text-gray-300 mt-3">
-                This demonstrates <strong>Judge WOW Moment #3</strong>. Revoking this credential will immediately update the live revocation registry. Any employer scanning this credential will see an immediate rejection.
+              <p className="text-xs text-[#69708A] mt-3 leading-relaxed">
+                Revoking this credential will immediately update the live revocation registry. Any employer scanning this credential will see an immediate rejection.
               </p>
 
               <div className="mt-4">
-                <label className="block text-xs font-medium text-gray-300 mb-1">
+                <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">
                   Revocation Reason
                 </label>
                 <input
@@ -905,20 +914,20 @@ export default function InstitutionDashboard() {
                   value={revocationReason}
                   onChange={(e) => setRevocationReason(e.target.value)}
                   placeholder="e.g. Academic record superseded or error corrected"
-                  className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm"
+                  className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]"
                 />
               </div>
 
               <div className="mt-6 flex items-center justify-end gap-3">
                 <button
                   onClick={() => setRevokingCredId(null)}
-                  className="px-4 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] text-xs font-semibold text-gray-300"
+                  className="px-4 py-2 rounded-xl btn-secondary text-xs font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleRevoke}
-                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-500/30"
+                  className="px-4 py-2 rounded-xl bg-[#EF4444] hover:bg-[#DC2626] text-white text-xs font-bold shadow-md transition-all"
                 >
                   Confirm Revocation
                 </button>

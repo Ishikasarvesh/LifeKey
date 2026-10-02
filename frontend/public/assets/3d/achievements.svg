@@ -1,0 +1,44 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="trophy-cup-grad" x1="40" y1="30" x2="160" y2="130" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#E8E6FF" />
+      <stop offset="100%" stop-color="#DCD9FF" />
+    </linearGradient>
+    <linearGradient id="trophy-gold" x1="60" y1="40" x2="140" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <linearGradient id="trophy-pedestal" x1="60" y1="140" x2="140" y2="175" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5B5BEF" />
+      <stop offset="100%" stop-color="#10142F" />
+    </linearGradient>
+    <filter id="trophy-shadow" x="15" y="15" width="170" height="175" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#5B5BEF" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <g filter="url(#trophy-shadow)">
+    <!-- Side Handles -->
+    <path d="M60 52C40 52 32 74 46 94C56 108 72 108 72 108" stroke="#DCD9FF" stroke-width="6" stroke-linecap="round" fill="none" />
+    <path d="M140 52C160 52 168 74 154 94C144 108 128 108 128 108" stroke="#DCD9FF" stroke-width="6" stroke-linecap="round" fill="none" />
+
+    <!-- Trophy Cup Body -->
+    <path d="M58 40H142V88C142 114 122 134 100 134C78 134 58 114 58 88V40Z" 
+          fill="url(#trophy-cup-grad)" stroke="#FFFFFF" stroke-width="2.5" />
+
+    <!-- Gold Central Star Emblem -->
+    <path d="M100 64L103.5 72.5L112.5 73.5L105.5 79.5L107.5 88.5L100 84L92.5 88.5L94.5 79.5L87.5 73.5L96.5 72.5L100 64Z" 
+          fill="url(#trophy-gold)" />
+
+    <!-- Stem -->
+    <rect x="94" y="134" width="12" height="18" fill="#DCD9FF" />
+
+    <!-- Pedestal Base -->
+    <path d="M72 152H128L136 172H64L72 152Z" fill="url(#trophy-pedestal)" stroke="#DCD9FF" stroke-width="1.5" />
+
+    <!-- Pedestal Metallic Plaque -->
+    <rect x="80" y="157" width="40" height="9" rx="3" fill="#FFFFFF" fill-opacity="0.8" />
+  </g>
+</svg>

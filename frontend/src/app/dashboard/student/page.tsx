@@ -224,33 +224,36 @@ export default function StudentDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#06050f] text-[#e2e0f0] flex flex-col selection:bg-violet-700 selection:text-white">
+    <div className="min-h-screen bg-[#F7F8FC] text-[#11152E] flex flex-col selection:bg-[#5B5BEF] selection:text-white relative overflow-hidden">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Soft Ambient Glow Orbs */}
+      <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-[#E8E6FF]/50 rounded-full blur-[140px] pointer-events-none" />
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
 
         {/* ── Header ──────────────────────────────────────── */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-white/[0.07]">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-[#DCD9FF]">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-[11px] font-mono uppercase px-2.5 py-0.5 rounded badge-teal font-bold tracking-wider">
+              <span className="text-[11px] font-mono uppercase px-3 py-1 rounded-full badge-indigo font-bold tracking-wider">
                 CITIZEN HOLDER WALLET
               </span>
-              <span className="text-[11px] text-[#7c78a0] font-mono">ID: {user?.id.slice(0, 8)}…</span>
+              <span className="text-xs text-[#69708A] font-mono font-semibold">ID: {user?.id.slice(0, 8)}…</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white">
-              Welcome, <span className="gradient-text-violet">{user?.name || "Student"}</span>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#10142F] tracking-tight">
+              Welcome, <span className="gradient-text-indigo">{user?.name || "Student"}</span>
             </h1>
-            <p className="text-sm text-[#8d8aab] mt-1">
+            <p className="text-sm text-[#69708A] mt-1 font-normal">
               Self-sovereign identity vault · Zero-knowledge proofs · Burn-after-read tokens
             </p>
           </div>
-          <div className="flex items-center gap-2.5">
-            <button onClick={loadData} className="btn-ghost px-3.5 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5">
+          <div className="flex items-center gap-3">
+            <button onClick={loadData} className="p-2.5 rounded-2xl bg-white hover:bg-[#F0EEFF] text-[#69708A] hover:text-[#10142F] border border-[#DCD9FF] text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all">
               <RefreshCw className="w-3.5 h-3.5" /> Refresh
             </button>
             <Link href="/verify/lifekey_demo_token_xyz890"
-              className="btn-teal px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5">
+              className="btn-primary px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 shadow-md">
               <QrCode className="w-3.5 h-3.5" /> Public Verifier
             </Link>
           </div>
@@ -258,10 +261,10 @@ export default function StudentDashboard() {
 
         {/* ── Action Success ────────────────────────────── */}
         {actionSuccess && (
-          <div className="mt-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-sm flex items-center justify-between animate-fade-up">
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" />{actionSuccess}</div>
+          <div className="mt-4 p-4 rounded-2xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] text-sm flex items-center justify-between shadow-sm animate-fade-up">
+            <div className="flex items-center gap-2 font-semibold"><CheckCircle2 className="w-4 h-4 text-[#10B981]" />{actionSuccess}</div>
             {qrModalToken && (
-              <button onClick={() => setQrModalToken(qrModalToken)} className="text-xs font-bold underline hover:text-white">
+              <button onClick={() => setQrModalToken(qrModalToken)} className="text-xs font-bold underline hover:text-[#047857]">
                 View QR
               </button>
             )}
@@ -270,18 +273,18 @@ export default function StudentDashboard() {
 
         {/* ── Overshare Warnings on Pending Consents ──── */}
         {pendingConsents.some(c => c.overshare_warnings && c.overshare_warnings.length > 0) && (
-          <div className="mt-5 p-4 rounded-2xl glass-panel-coral animate-fade-up">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="w-5 h-5 text-[#fb923c]" />
-              <span className="font-bold text-[#fb923c] text-sm">Anomalous Data Requests Detected</span>
+          <div className="mt-5 p-4 rounded-2xl bg-[#FFF7ED] border border-[#FED7AA] shadow-sm animate-fade-up">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="w-5 h-5 text-[#EA580C]" />
+              <span className="font-bold text-[#EA580C] text-sm">Anomalous Data Requests Detected</span>
             </div>
             {pendingConsents.filter(c => c.overshare_warnings?.length).map(c => (
-              <div key={c.id} className="mb-2 text-xs text-[#e2e0f0]/80">
-                <span className="font-semibold text-white">{c.requester_name}:</span>{" "}
-                {c.overshare_warnings?.join(" · ")}
+              <div key={c.id} className="mb-1 text-xs text-[#10142F]">
+                <span className="font-semibold text-[#10142F]">{c.requester_name}:</span>{" "}
+                <span className="text-[#69708A]">{c.overshare_warnings?.join(" · ")}</span>
               </div>
             ))}
-            <p className="text-[11px] text-[#8d8aab] mt-2">
+            <p className="text-[11px] text-[#69708A] mt-2">
               Review these requests carefully. You can selectively deny unusual fields before approving.
             </p>
           </div>
@@ -289,34 +292,29 @@ export default function StudentDashboard() {
 
         {/* ── Life Transition Passport ────────────────── */}
         {transition && (
-          <div className="mt-7 p-6 rounded-3xl glass-panel-glow relative overflow-hidden animate-fade-up">
-            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-gradient-to-bl from-violet-700/20 via-teal-500/10 to-transparent blur-3xl pointer-events-none animate-orb" />
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
-
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 pb-5 border-b border-white/[0.07]">
+          <div className="mt-7 p-6 sm:p-7 rounded-3xl glass-card bg-white border-[#DCD9FF] shadow-sm relative overflow-hidden animate-fade-up">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 pb-5 border-b border-[#F0EEFF]">
               <div>
-                <div className="flex items-center gap-2 text-[11px] font-mono text-violet-400 uppercase font-bold tracking-widest">
+                <div className="flex items-center gap-2 text-[11px] font-mono text-[#5B5BEF] uppercase font-bold tracking-widest">
                   <Sparkles className="w-3.5 h-3.5" /> LIFE TRANSITION ENGINE
                 </div>
-                <h2 className="text-2xl font-black text-white mt-1.5">
-                  Passport: <span className="gradient-text-teal">Student → Employee</span>
+                <h2 className="text-2xl font-extrabold text-[#10142F] mt-1">
+                  Passport: <span className="gradient-text-indigo">Student → Employee</span>
                 </h2>
-                <p className="text-sm text-[#8d8aab] mt-1 max-w-2xl">
+                <p className="text-sm text-[#69708A] mt-1 max-w-2xl font-normal">
                   Automated onboarding readiness engine. Correlates your verified credentials for zero-reverification employment entry.
                 </p>
               </div>
-              <div className="flex items-center gap-4 bg-white/[0.03] p-4 rounded-2xl border border-white/[0.07] shrink-0">
+              <div className="flex items-center gap-4 bg-[#F7F6FF] p-4 rounded-2xl border border-[#DCD9FF] shrink-0">
                 <div className="text-right">
-                  <div className="text-[11px] text-[#7c78a0] uppercase font-mono tracking-wider">Readiness</div>
-                  <div className="text-xl font-black text-white mt-0.5">{transition.completed} / {transition.total}</div>
-                  <div className={`text-[11px] font-bold mt-0.5 ${transition.ready ? "text-emerald-400" : "text-[#fbbf24]"}`}>
+                  <div className="text-[11px] text-[#69708A] uppercase font-mono tracking-wider font-bold">Readiness</div>
+                  <div className="text-xl font-black text-[#10142F] mt-0.5">{transition.completed} / {transition.total}</div>
+                  <div className={`text-[11px] font-bold mt-0.5 ${transition.ready ? "text-[#10B981]" : "text-[#D97706]"}`}>
                     {transition.ready ? "✓ TRANSITION READY" : "In Progress"}
                   </div>
                 </div>
-                <div className="w-14 h-14 rounded-2xl p-[2px] shadow-lg"
-                  style={{ background: "linear-gradient(135deg, #8b5cf6, #14b8a6)" }}>
-                  <div className="w-full h-full bg-[#0c0b1a] rounded-[14px] flex items-center justify-center font-black text-lg"
-                    style={{ color: "#a78bfa" }}>
+                <div className="w-14 h-14 rounded-2xl p-[2px] shadow-sm bg-gradient-to-tr from-[#5B5BEF] to-[#7167F6]">
+                  <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center font-black text-lg text-[#5B5BEF]">
                     {Math.round((transition.completed / transition.total) * 100)}%
                   </div>
                 </div>
@@ -326,14 +324,14 @@ export default function StudentDashboard() {
             <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {transition.requirements.map((req, idx) => (
                 <div key={idx} className={`p-3.5 rounded-2xl border transition-all ${req.met
-                  ? "bg-emerald-500/[0.06] border-emerald-500/25 text-emerald-300"
-                  : "bg-white/[0.02] border-white/[0.06] text-[#7c78a0]"}`}>
+                  ? "bg-[#ECFDF5] border-[#A7F3D0] text-[#065F46]"
+                  : "bg-white border-[#DCD9FF] text-[#69708A]"}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono uppercase tracking-widest">REQ {String(idx + 1).padStart(2, "0")}</span>
-                    {req.met ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Clock className="w-4 h-4 text-amber-400" />}
+                    <span className="text-[10px] font-mono uppercase tracking-widest font-bold">REQ {String(idx + 1).padStart(2, "0")}</span>
+                    {req.met ? <CheckCircle2 className="w-4 h-4 text-[#10B981]" /> : <Clock className="w-4 h-4 text-[#D97706]" />}
                   </div>
-                  <div className="text-xs font-bold text-white leading-snug">{req.name}</div>
-                  <div className="text-[10px] mt-1">{req.met ? "Verified" : "Missing"}</div>
+                  <div className="text-xs font-bold text-[#10142F] leading-snug">{req.name}</div>
+                  <div className="text-[10px] mt-1 font-semibold">{req.met ? "Verified" : "Missing"}</div>
                 </div>
               ))}
             </div>
@@ -346,22 +344,22 @@ export default function StudentDashboard() {
           {/* Left: Tab Panel */}
           <div className="lg:col-span-7 space-y-5">
             {/* Tab Nav */}
-            <div className="flex gap-1 p-1 rounded-2xl bg-white/[0.03] border border-white/[0.07] overflow-x-auto">
+            <div className="flex gap-1.5 p-1.5 rounded-2xl bg-[#F0EEFF] border border-[#DCD9FF] overflow-x-auto">
               {TABS.map(tab => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all relative shrink-0 ${
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all relative shrink-0 ${
                     activeTab === tab.id
-                      ? "bg-white/[0.08] text-white shadow-sm"
-                      : "text-[#7c78a0] hover:text-[#c4c0dc]"
+                      ? "bg-white text-[#10142F] shadow-sm"
+                      : "text-[#69708A] hover:text-[#10142F]"
                   }`}>
                   {tab.icon}
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span>{tab.label}</span>
                   {tab.badge !== undefined && tab.badge > 0 && (
                     <span className={`ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                      tab.color === "amber" ? "bg-amber-500/20 text-amber-300" :
-                      tab.color === "teal" ? "bg-teal-500/20 text-teal-300" :
-                      tab.color === "coral" ? "bg-orange-500/20 text-orange-300" :
-                      "bg-violet-500/20 text-violet-300"
+                      tab.color === "amber" ? "bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]" :
+                      tab.color === "teal" ? "bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]" :
+                      tab.color === "coral" ? "bg-[#FFF7ED] text-[#EA580C] border border-[#FFEDD5]" :
+                      "bg-[#F0EEFF] text-[#5B5BEF] border border-[#DCD9FF]"
                     }`}>
                       {tab.badge}
                     </span>
@@ -374,83 +372,84 @@ export default function StudentDashboard() {
             {activeTab === "wallet" && (
               <div className="space-y-4 animate-fade-up">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <KeyRound className="w-5 h-5 text-violet-400" /> Cryptographic Credentials
+                  <h3 className="text-lg font-extrabold text-[#10142F] flex items-center gap-2">
+                    <KeyRound className="w-5 h-5 text-[#5B5BEF]" />
+                    <span>Cryptographic Credentials</span>
                   </h3>
-                  <span className="text-[11px] font-mono px-2.5 py-1 rounded-full badge-violet">{credentials.length} creds</span>
+                  <span className="text-[11px] font-mono px-3 py-1 rounded-full badge-indigo font-bold">{credentials.length} creds</span>
                 </div>
                 {loading ? (
-                  <div className="p-12 text-center text-[#7c78a0] text-sm glass-panel rounded-2xl">Loading vault…</div>
+                  <div className="p-12 text-center text-[#69708A] text-sm glass-card bg-white border-[#DCD9FF] rounded-2xl">Loading vault…</div>
                 ) : credentials.length === 0 ? (
-                  <div className="p-10 text-center glass-panel rounded-2xl border border-white/[0.07]">
-                    <GraduationCap className="w-10 h-10 text-[#3d3a5c] mx-auto mb-3" />
-                    <h4 className="text-base font-bold text-white">No Credentials Yet</h4>
-                    <p className="text-xs text-[#7c78a0] mt-1">Log in as an institution to issue a verifiable award.</p>
+                  <div className="p-10 text-center glass-card bg-white rounded-2xl border-[#DCD9FF]">
+                    <GraduationCap className="w-10 h-10 text-[#69708A] mx-auto mb-3" />
+                    <h4 className="text-base font-bold text-[#10142F]">No Credentials Yet</h4>
+                    <p className="text-xs text-[#69708A] mt-1">Log in as an institution to issue a verifiable award.</p>
                   </div>
                 ) : (
                   credentials.map(cred => {
                     const data = cred.credential_data;
                     return (
-                      <div key={cred.id} className="p-5 rounded-2xl glass-panel card-hover border border-white/[0.07] relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-1 h-full rounded-l-2xl" style={{
-                          background: cred.status === "ACTIVE" ? "linear-gradient(180deg,#8b5cf6,#14b8a6)" :
-                                      cred.status === "REVOKED" ? "#e11d48" : "#fbbf24"
+                      <div key={cred.id} className="p-5 rounded-2xl glass-card bg-white border border-[#DCD9FF] shadow-sm hover:border-[#5B5BEF]/50 transition-all relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-1.5 h-full rounded-l-2xl" style={{
+                          background: cred.status === "ACTIVE" ? "#10B981" :
+                                      cred.status === "REVOKED" ? "#EF4444" : "#F59E0B"
                         }} />
                         <div className="pl-3 flex items-start justify-between gap-4">
                           <div className="flex items-start gap-3.5">
-                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-600/20 to-teal-500/20 border border-violet-500/25 flex items-center justify-center text-violet-400 shrink-0">
+                            <div className="w-11 h-11 rounded-2xl bg-[#F0EEFF] border border-[#DCD9FF] flex items-center justify-center text-[#5B5BEF] shadow-sm shrink-0">
                               {cred.credential_type === "DIPLOMA" ? <GraduationCap className="w-5 h-5" /> :
                                cred.credential_type === "SKILL" ? <Award className="w-5 h-5" /> :
                                <FileText className="w-5 h-5" />}
                             </div>
                             <div>
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded badge-violet font-bold">{cred.credential_type}</span>
-                                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
-                                    cred.status === "ACTIVE" ? "badge-lime" : "badge-rose"
-                                  }`}>{cred.status}</span>
-                                  {cred.quality_status === "review_required" ? (
-                                    <span className="text-[10px] font-mono px-2 py-0.5 rounded font-bold badge-amber flex items-center gap-1">
-                                      ⚠ Review Item
-                                    </span>
-                                  ) : (
-                                    <span className="text-[10px] font-mono px-2 py-0.5 rounded font-bold badge-lime flex items-center gap-1">
-                                      ✓ QA Verified
-                                    </span>
-                                  )}
-                                </div>
-                              <h4 className="text-sm font-bold text-white mt-1.5">{data.title || "Verifiable Credential"}</h4>
-                              <p className="text-xs text-[#8d8aab] mt-0.5">
-                                Issuer: <strong className="text-[#c4c0dc]">{cred.issuer_name}</strong>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded badge-indigo font-bold">{cred.credential_type}</span>
+                                <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded font-bold ${
+                                  cred.status === "ACTIVE" ? "badge-lime" : "badge-rose"
+                                }`}>{cred.status}</span>
+                                {cred.quality_status === "review_required" ? (
+                                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded font-bold badge-amber flex items-center gap-1">
+                                    ⚠ Review Item
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded font-bold badge-lime flex items-center gap-1">
+                                    ✓ QA Verified
+                                  </span>
+                                )}
+                              </div>
+                              <h4 className="text-base font-bold text-[#10142F] mt-1.5">{data.title || "Verifiable Credential"}</h4>
+                              <p className="text-xs text-[#69708A] mt-0.5">
+                                Issuer: <strong className="text-[#10142F]">{cred.issuer_name}</strong>
                               </p>
                             </div>
                           </div>
-                          <button onClick={() => setActiveModalCred(cred)} title="Inspect"
-                            className="p-2 rounded-xl btn-ghost border border-white/[0.07] text-[#7c78a0] hover:text-white shrink-0">
+                          <button onClick={() => setActiveModalCred(cred)} title="Inspect Credential Payload"
+                            className="p-2.5 rounded-xl bg-white hover:bg-[#F0EEFF] border border-[#DCD9FF] text-[#69708A] hover:text-[#5B5BEF] shadow-sm transition-all shrink-0">
                             <Eye className="w-4 h-4" />
                           </button>
                         </div>
 
-                        <div className="mt-4 pt-3 pl-3 border-t border-white/[0.06] flex flex-wrap gap-2">
+                        <div className="mt-4 pt-3 pl-3 border-t border-[#F0EEFF] flex flex-wrap gap-2">
                           {data.cgpa && (
-                            <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs text-[#c4c0dc]">
-                              CGPA: <strong className="text-teal-400">{data.cgpa}</strong>
+                            <span className="px-3 py-1 rounded-xl bg-[#F7F6FF] border border-[#DCD9FF] text-xs text-[#10142F]">
+                              CGPA: <strong className="text-[#059669]">{data.cgpa}</strong>
                             </span>
                           )}
                           {data.major && (
-                            <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs text-[#c4c0dc]">
+                            <span className="px-3 py-1 rounded-xl bg-[#F7F6FF] border border-[#DCD9FF] text-xs text-[#10142F]">
                               {data.major}
                             </span>
                           )}
                           {data.skills && Array.isArray(data.skills) && (
-                            <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs text-[#c4c0dc]">
-                              Skills: <strong className="text-violet-400">{data.skills.join(", ")}</strong>
+                            <span className="px-3 py-1 rounded-xl bg-[#F7F6FF] border border-[#DCD9FF] text-xs text-[#10142F]">
+                              Skills: <strong className="text-[#5B5BEF]">{data.skills.join(", ")}</strong>
                             </span>
                           )}
                         </div>
 
-                        <div className="mt-3 pl-3 flex items-center gap-1.5 text-[11px] font-mono text-[#5c5880]">
-                          <Lock className="w-3 h-3 text-teal-500 shrink-0" />
+                        <div className="mt-3 pl-3 flex items-center gap-1.5 text-[11px] font-mono text-[#69708A]">
+                          <Lock className="w-3.5 h-3.5 text-[#5B5BEF] shrink-0" />
                           <span className="truncate">SHA-256: {cred.credential_hash.slice(0, 40)}…</span>
                         </div>
                       </div>
@@ -464,24 +463,25 @@ export default function StudentDashboard() {
             {activeTab === "zk" && (
               <div className="space-y-5 animate-fade-up">
                 <div>
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Fingerprint className="w-5 h-5 text-teal-400" /> Zero-Knowledge Attribute Proofs
+                  <h3 className="text-lg font-extrabold text-[#10142F] flex items-center gap-2">
+                    <Fingerprint className="w-5 h-5 text-[#5B5BEF]" />
+                    <span>Zero-Knowledge Attribute Proofs</span>
                   </h3>
-                  <p className="text-xs text-[#8d8aab] mt-1">
+                  <p className="text-xs text-[#69708A] mt-1">
                     Prove a condition without revealing the actual value. The verifier gets a cryptographic guarantee, not your private data.
                   </p>
                 </div>
 
                 {/* ZK Generator */}
-                <div className="p-5 rounded-2xl glass-panel-teal">
-                  <div className="text-xs font-mono text-teal-400 uppercase font-bold mb-4 flex items-center gap-2">
+                <div className="p-6 rounded-3xl glass-card bg-white border-[#DCD9FF] shadow-sm">
+                  <div className="text-xs font-mono text-[#5B5BEF] uppercase font-bold mb-4 flex items-center gap-2">
                     <Zap className="w-3.5 h-3.5" /> Generate New ZK Proof
                   </div>
                   <form onSubmit={handleCreateZKProof} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-medium text-[#a8a4c8] mb-1.5">Credential</label>
+                      <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">Credential</label>
                       <select value={zkCredId} onChange={e => setZkCredId(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm bg-[#06050f]">
+                        className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]">
                         {credentials.map(c => (
                           <option key={c.id} value={c.id}>{c.credential_data.title || c.credential_type} — {c.issuer_name}</option>
                         ))}
@@ -489,9 +489,9 @@ export default function StudentDashboard() {
                     </div>
                     <div className="grid grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-[#a8a4c8] mb-1.5">Attribute</label>
+                        <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">Attribute</label>
                         <select value={zkAttr} onChange={e => setZkAttr(e.target.value)}
-                          className="w-full px-3 py-2.5 rounded-xl glass-input text-sm bg-[#06050f]">
+                          className="w-full px-3 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]">
                           <option value="cgpa">CGPA</option>
                           <option value="graduation_year">Grad Year</option>
                           <option value="age">Age</option>
@@ -499,9 +499,9 @@ export default function StudentDashboard() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-[#a8a4c8] mb-1.5">Predicate</label>
+                        <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">Predicate</label>
                         <select value={zkPredicate} onChange={e => setZkPredicate(e.target.value)}
-                          className="w-full px-3 py-2.5 rounded-xl glass-input text-sm bg-[#06050f]">
+                          className="w-full px-3 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]">
                           <option>&gt;</option>
                           <option>&gt;=</option>
                           <option>==</option>
@@ -510,14 +510,14 @@ export default function StudentDashboard() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-[#a8a4c8] mb-1.5">Threshold</label>
+                        <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">Threshold</label>
                         <input type="text" value={zkThreshold} onChange={e => setZkThreshold(e.target.value)}
-                          className="w-full px-3 py-2.5 rounded-xl glass-input text-sm font-mono"
+                          className="w-full px-3 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]"
                           placeholder="8.0" />
                       </div>
                     </div>
                     <button type="submit" disabled={zkLoading || credentials.length === 0}
-                      className="w-full py-2.5 rounded-xl btn-teal text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50">
+                      className="btn-primary w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-md disabled:opacity-50">
                       {zkLoading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> :
                         <><Fingerprint className="w-4 h-4" /> Generate ZK Proof</>}
                     </button>
@@ -525,26 +525,26 @@ export default function StudentDashboard() {
 
                   {/* ZK Result */}
                   {zkResult && (
-                    <div className={`mt-4 p-4 rounded-xl border ${zkResult.result
-                      ? "bg-emerald-500/10 border-emerald-500/25"
-                      : "bg-rose-500/10 border-rose-500/25"}`}>
+                    <div className={`mt-4 p-4 rounded-2xl border ${zkResult.result
+                      ? "bg-[#ECFDF5] border-[#A7F3D0] text-[#065F46]"
+                      : "bg-[#FEF2F2] border-[#FECACA] text-[#991B1B]"}`}>
                       <div className="flex items-center gap-2 mb-3">
-                        {zkResult.result ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <XCircle className="w-5 h-5 text-rose-400" />}
-                        <span className={`font-bold text-sm ${zkResult.result ? "text-emerald-300" : "text-rose-300"}`}>
+                        {zkResult.result ? <CheckCircle2 className="w-5 h-5 text-[#10B981]" /> : <XCircle className="w-5 h-5 text-[#EF4444]" />}
+                        <span className="font-bold text-sm">
                           {zkResult.label}
                         </span>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-[11px]">
-                        <div className="bg-black/30 p-2 rounded-lg">
-                          <div className="text-[#7c78a0] font-mono">PROOF ID</div>
-                          <div className="text-teal-300 font-mono truncate">{zkResult.id.slice(0, 18)}…</div>
+                        <div className="bg-white p-2.5 rounded-xl border border-[#DCD9FF]">
+                          <div className="text-[#69708A] font-mono font-bold">PROOF ID</div>
+                          <div className="text-[#10142F] font-mono truncate">{zkResult.id.slice(0, 18)}…</div>
                         </div>
-                        <div className="bg-black/30 p-2 rounded-lg">
-                          <div className="text-[#7c78a0] font-mono">PROOF HASH</div>
-                          <div className="text-violet-300 font-mono truncate">{zkResult.proof_hash.slice(0, 18)}…</div>
+                        <div className="bg-white p-2.5 rounded-xl border border-[#DCD9FF]">
+                          <div className="text-[#69708A] font-mono font-bold">PROOF HASH</div>
+                          <div className="text-[#5B5BEF] font-mono truncate">{zkResult.proof_hash.slice(0, 18)}…</div>
                         </div>
                       </div>
-                      <p className="text-[11px] text-[#7c78a0] mt-2">
+                      <p className="text-[11px] text-[#69708A] mt-2 font-medium">
                         Raw value was NEVER shared. Verifier receives only the boolean result above.
                       </p>
                     </div>
@@ -553,24 +553,24 @@ export default function StudentDashboard() {
 
                 {/* ZK Proofs List */}
                 {zkProofs.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-xs font-semibold text-[#a8a4c8] uppercase tracking-wider mb-2">Generated Proofs</div>
+                  <div className="space-y-2.5">
+                    <div className="text-xs font-bold text-[#10142F] uppercase tracking-wider mb-2">Generated Proofs</div>
                     {zkProofs.map(zk => (
-                      <div key={zk.id} className="p-4 rounded-xl glass-panel border border-white/[0.07] flex items-center justify-between gap-4">
+                      <div key={zk.id} className="p-4 rounded-2xl glass-card bg-white border border-[#DCD9FF] shadow-sm flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
-                            zk.result ? "bg-emerald-500/15 text-emerald-400" : "bg-rose-500/15 text-rose-400"
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold ${
+                            zk.result ? "bg-[#ECFDF5] text-[#10B981] border border-[#A7F3D0]" : "bg-[#FEF2F2] text-[#EF4444] border border-[#FECACA]"
                           }`}>
                             {zk.result ? "✓" : "✗"}
                           </div>
                           <div>
-                            <div className="text-sm font-semibold text-white">{zk.label}</div>
-                            <div className="text-[11px] text-[#7c78a0] font-mono">{new Date(zk.created_at).toLocaleString()}</div>
+                            <div className="text-sm font-bold text-[#10142F]">{zk.label}</div>
+                            <div className="text-[11px] text-[#69708A] font-mono">{new Date(zk.created_at).toLocaleString()}</div>
                           </div>
                         </div>
                         <button onClick={() => copyToClipboard(zk.id, zk.id)}
-                          className="p-1.5 rounded-lg btn-ghost text-[#7c78a0] hover:text-white shrink-0" title="Copy Proof ID">
-                          {copiedId === zk.id ? <CheckCheck className="w-3.5 h-3.5 text-teal-400" /> : <Copy className="w-3.5 h-3.5" />}
+                          className="p-2 rounded-xl bg-white hover:bg-[#F0EEFF] text-[#69708A] hover:text-[#10142F] border border-[#DCD9FF] shadow-sm shrink-0" title="Copy Proof ID">
+                          {copiedId === zk.id ? <CheckCheck className="w-3.5 h-3.5 text-[#10B981]" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
                     ))}
@@ -583,23 +583,24 @@ export default function StudentDashboard() {
             {activeTab === "burn" && (
               <div className="space-y-5 animate-fade-up">
                 <div>
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Flame className="w-5 h-5 text-orange-400" /> Burn-After-Reading Tokens
+                  <h3 className="text-lg font-extrabold text-[#10142F] flex items-center gap-2">
+                    <Flame className="w-5 h-5 text-[#EA580C]" />
+                    <span>Burn-After-Reading Tokens</span>
                   </h3>
-                  <p className="text-xs text-[#8d8aab] mt-1">
+                  <p className="text-xs text-[#69708A] mt-1">
                     Generate a one-time QR link that self-destructs after a single scan or TTL expiry. Replay attacks are blocked and logged.
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl glass-panel-coral">
-                  <div className="text-xs font-mono text-orange-400 uppercase font-bold mb-4 flex items-center gap-2">
+                <div className="p-6 rounded-3xl glass-card bg-white border-[#DCD9FF] shadow-sm">
+                  <div className="text-xs font-mono text-[#EA580C] uppercase font-bold mb-4 flex items-center gap-2">
                     <Flame className="w-3.5 h-3.5" /> Create Burn Token
                   </div>
                   <form onSubmit={handleCreateBurnToken} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-medium text-[#a8a4c8] mb-1.5">Approved Consent</label>
+                      <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">Approved Consent</label>
                       <select value={burnConsentId} onChange={e => setBurnConsentId(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm bg-[#06050f]">
+                        className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs sm:text-sm font-semibold bg-white text-[#10142F] border-[#DCD9FF]">
                         {approvedConsents.length > 0
                           ? approvedConsents.map(c => (
                               <option key={c.id} value={c.id}>{c.requester_name} — {new Date(c.created_at).toLocaleDateString()}</option>
@@ -609,36 +610,36 @@ export default function StudentDashboard() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-[#a8a4c8] mb-1.5">
-                        TTL: <strong className="text-orange-400">{burnTTL} minute{burnTTL !== 1 ? "s" : ""}</strong>
+                      <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1.5">
+                        TTL: <strong className="text-[#EA580C]">{burnTTL} minute{burnTTL !== 1 ? "s" : ""}</strong>
                       </label>
                       <input type="range" min={1} max={60} value={burnTTL} onChange={e => setBurnTTL(Number(e.target.value))}
-                        className="w-full accent-orange-500" />
-                      <div className="flex justify-between text-[10px] text-[#5c5880] mt-1 font-mono">
+                        className="w-full accent-[#5B5BEF]" />
+                      <div className="flex justify-between text-[10px] text-[#69708A] mt-1 font-mono font-bold">
                         <span>1 min</span><span>30 min</span><span>60 min</span>
                       </div>
                     </div>
                     <button type="submit" disabled={burnLoading || !burnConsentId}
-                      className="w-full py-2.5 rounded-xl btn-coral text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50">
+                      className="btn-primary w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-md disabled:opacity-50">
                       {burnLoading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> :
                         <><Flame className="w-4 h-4" /> Generate Burn Token</>}
                     </button>
                   </form>
 
                   {burnResult && (
-                    <div className="mt-4 p-4 rounded-xl bg-orange-500/10 border border-orange-500/25 space-y-3">
-                      <div className="flex items-center gap-2 text-orange-300 font-bold text-sm">
+                    <div className="mt-4 p-5 rounded-2xl bg-[#FFF7ED] border border-[#FFEDD5] space-y-3">
+                      <div className="flex items-center gap-2 text-[#EA580C] font-bold text-sm">
                         <Flame className="w-4 h-4" /> Burn Token Created
                       </div>
                       <div className="text-center py-3">
-                        <div className="inline-block p-3 rounded-xl bg-white shadow-xl">
+                        <div className="inline-block p-4 rounded-2xl bg-white shadow-xl border border-[#DCD9FF]">
                           <QRCodeSVG value={burnResult.verify_url || `http://localhost:3000/burn/${burnResult.token}`} size={160} level="H" />
                         </div>
                       </div>
-                      <div className="text-[11px] font-mono text-[#8d8aab] break-all bg-black/40 p-2 rounded-lg">
+                      <div className="text-[11px] font-mono text-[#69708A] break-all bg-white p-3 rounded-xl border border-[#DCD9FF]">
                         {burnResult.verify_url}
                       </div>
-                      <p className="text-[11px] text-orange-300">
+                      <p className="text-[11px] text-[#EA580C] font-semibold">
                         ⚠ This link expires in {burnTTL} min and will self-destruct after ONE scan.
                       </p>
                     </div>
@@ -647,27 +648,27 @@ export default function StudentDashboard() {
 
                 {/* Burn Token History */}
                 {burnTokens.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-xs font-semibold text-[#a8a4c8] uppercase tracking-wider mb-2">Token History</div>
+                  <div className="space-y-2.5">
+                    <div className="text-xs font-bold text-[#10142F] uppercase tracking-wider mb-2">Token History</div>
                     {burnTokens.map(bt => (
-                      <div key={bt.id} className={`p-4 rounded-xl glass-panel border flex items-center justify-between gap-4 ${
-                        bt.is_burned ? "border-rose-500/20" : "border-white/[0.07]"
+                      <div key={bt.id} className={`p-4 rounded-2xl glass-card bg-white border flex items-center justify-between gap-4 shadow-sm ${
+                        bt.is_burned ? "border-[#FECACA]" : "border-[#DCD9FF]"
                       }`}>
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                            bt.is_burned ? "bg-rose-500/15" : "bg-orange-500/15"
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                            bt.is_burned ? "bg-[#FEF2F2] text-[#EF4444]" : "bg-[#FFF7ED] text-[#EA580C]"
                           }`}>
-                            <Flame className={`w-4 h-4 ${bt.is_burned ? "text-rose-400" : "text-orange-400"}`} />
+                            <Flame className="w-4 h-4" />
                           </div>
                           <div>
-                            <div className={`text-xs font-bold ${bt.is_burned ? "text-rose-300" : "text-orange-300"}`}>
+                            <div className={`text-xs font-bold ${bt.is_burned ? "text-[#EF4444]" : "text-[#EA580C]"}`}>
                               {bt.is_burned ? "BURNED" : "ACTIVE"}
                             </div>
-                            <div className="text-[11px] text-[#7c78a0] font-mono">
+                            <div className="text-[11px] text-[#69708A] font-mono">
                               Created: {new Date(bt.created_at).toLocaleString()}
                             </div>
                             {bt.attempted_reuse_count > 0 && (
-                              <div className="text-[10px] text-rose-400 font-mono">
+                              <div className="text-[10px] text-[#DC2626] font-mono font-bold">
                                 {bt.attempted_reuse_count} unauthorized replay attempt{bt.attempted_reuse_count !== 1 ? "s" : ""} blocked
                               </div>
                             )}
@@ -675,8 +676,8 @@ export default function StudentDashboard() {
                         </div>
                         {!bt.is_burned && (
                           <button onClick={() => copyToClipboard(bt.verify_url || "", bt.id)}
-                            className="p-1.5 rounded-lg btn-ghost text-[#7c78a0] hover:text-white shrink-0">
-                            {copiedId === bt.id ? <CheckCheck className="w-3.5 h-3.5 text-teal-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            className="p-2 rounded-xl bg-white hover:bg-[#F0EEFF] text-[#69708A] hover:text-[#10142F] border border-[#DCD9FF] shadow-sm shrink-0">
+                            {copiedId === bt.id ? <CheckCheck className="w-3.5 h-3.5 text-[#10B981]" /> : <Copy className="w-3.5 h-3.5" />}
                           </button>
                         )}
                       </div>
@@ -691,17 +692,18 @@ export default function StudentDashboard() {
               <div className="space-y-5 animate-fade-up">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                      <Brain className="w-5 h-5 text-amber-400" /> Credential Intelligence
+                    <h3 className="text-lg font-extrabold text-[#10142F] flex items-center gap-2">
+                      <Brain className="w-5 h-5 text-[#5B5BEF]" />
+                      <span>Credential Intelligence</span>
                     </h3>
-                    <p className="text-xs text-[#8d8aab] mt-1">Automated quality & duplicate detection across your entire wallet.</p>
+                    <p className="text-xs text-[#69708A] mt-1 font-normal">Automated quality & duplicate detection across your entire wallet.</p>
                   </div>
                   {intelReport && (
-                    <div className={`text-center px-4 py-2 rounded-xl border ${
+                    <div className={`text-center px-4 py-2 rounded-2xl border ${
                       intelReport.quality_score >= 80 ? "badge-lime" :
                       intelReport.quality_score >= 50 ? "badge-amber" : "badge-rose"
                     }`}>
-                      <div className="text-[10px] font-mono uppercase">Quality Score</div>
+                      <div className="text-[10px] font-mono uppercase font-bold">Quality Score</div>
                       <div className="text-xl font-black">{intelReport.quality_score}/100</div>
                     </div>
                   )}
@@ -711,11 +713,11 @@ export default function StudentDashboard() {
                   <>
                     {/* Summary Grid */}
                     {Object.keys(intelReport.summary).length > 0 && (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                         {Object.entries(intelReport.summary).map(([type, count]) => (
-                          <div key={type} className="p-3 rounded-xl glass-panel border border-amber-500/15 text-center">
-                            <div className="text-lg font-black text-amber-300">{count}</div>
-                            <div className="text-[10px] font-mono text-[#7c78a0] uppercase">{type.replace("_", " ")}</div>
+                          <div key={type} className="p-3.5 rounded-2xl glass-card bg-white border border-[#DCD9FF] text-center shadow-sm">
+                            <div className="text-xl font-black text-[#5B5BEF]">{count}</div>
+                            <div className="text-[10px] font-mono text-[#69708A] uppercase font-bold">{type.replace("_", " ")}</div>
                           </div>
                         ))}
                       </div>
@@ -723,49 +725,49 @@ export default function StudentDashboard() {
 
                     {/* Flags List */}
                     {intelReport.flags.length === 0 ? (
-                      <div className="p-8 text-center glass-panel rounded-2xl border border-white/[0.07]">
-                        <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-3" />
-                        <h4 className="text-base font-bold text-white">All Clear!</h4>
-                        <p className="text-xs text-[#7c78a0] mt-1">No credential issues detected. Your wallet is clean.</p>
+                      <div className="p-8 text-center glass-card bg-white rounded-2xl border-[#A7F3D0] shadow-sm">
+                        <CheckCircle2 className="w-10 h-10 text-[#10B981] mx-auto mb-3" />
+                        <h4 className="text-base font-bold text-[#10142F]">All Clear!</h4>
+                        <p className="text-xs text-[#69708A] mt-1">No credential issues detected. Your wallet is clean.</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {intelReport.flags.map(flag => (
-                          <div key={flag.id} className={`p-4 rounded-xl glass-panel border ${
-                            flag.severity === "HIGH" ? "border-rose-500/25 bg-rose-500/[0.04]" :
-                            flag.severity === "MEDIUM" ? "border-amber-500/25 bg-amber-500/[0.04]" :
-                            "border-white/[0.08]"
+                          <div key={flag.id} className={`p-4 rounded-2xl glass-card bg-white border shadow-sm ${
+                            flag.severity === "HIGH" ? "border-[#FECACA] bg-[#FEF2F2]/20" :
+                            flag.severity === "MEDIUM" ? "border-[#FDE68A] bg-[#FFFBEB]/20" :
+                            "border-[#DCD9FF]"
                           }`}>
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex items-start gap-3">
-                                <div className={`mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                                  flag.severity === "HIGH" ? "bg-rose-500/15 text-rose-400" :
-                                  flag.severity === "MEDIUM" ? "bg-amber-500/15 text-amber-400" :
-                                  "bg-blue-500/15 text-blue-400"
+                                <div className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                                  flag.severity === "HIGH" ? "bg-[#FEF2F2] text-[#EF4444]" :
+                                  flag.severity === "MEDIUM" ? "bg-[#FFFBEB] text-[#D97706]" :
+                                  "bg-[#F0EEFF] text-[#5B5BEF]"
                                 }`}>
-                                  <AlertTriangle className="w-3.5 h-3.5" />
+                                  <AlertTriangle className="w-4 h-4" />
                                 </div>
                                 <div>
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <span className={`text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded ${
                                       flag.severity === "HIGH" ? "badge-rose" :
-                                      flag.severity === "MEDIUM" ? "badge-amber" : "badge-teal"
+                                      flag.severity === "MEDIUM" ? "badge-amber" : "badge-indigo"
                                     }`}>{flag.flag_type.replace("_", " ")}</span>
-                                    <span className="text-[10px] text-[#5c5880] font-mono">{flag.severity}</span>
+                                    <span className="text-[10px] text-[#69708A] font-mono font-semibold">{flag.severity}</span>
                                   </div>
-                                  <p className="text-xs text-[#c4c0dc] mt-1.5 leading-relaxed">{flag.description}</p>
+                                  <p className="text-xs font-semibold text-[#10142F] mt-1.5 leading-relaxed">{flag.description}</p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
                                 {flag.credential_id_b && (
                                   <button onClick={() => handleOpenCompare(flag.credential_id_a, flag.credential_id_b!)}
                                     disabled={comparingLoading}
-                                    className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold flex items-center gap-1">
-                                    <Scale className="w-3 h-3" /> Compare Records
+                                    className="px-3 py-1.5 rounded-xl bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] text-[11px] font-bold flex items-center gap-1 shadow-sm">
+                                    <Scale className="w-3 h-3" /> Compare
                                   </button>
                                 )}
                                 <button onClick={() => handleResolveFlag(flag.id)}
-                                  className="px-3 py-1.5 rounded-lg btn-ghost text-[11px] font-semibold border border-white/[0.07]">
+                                  className="px-3 py-1.5 rounded-xl btn-secondary text-[11px] font-bold">
                                   Resolve
                                 </button>
                               </div>
@@ -783,27 +785,28 @@ export default function StudentDashboard() {
             {activeTab === "camera" && (
               <div className="space-y-5 animate-fade-up">
                 <div>
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Camera className="w-5 h-5 text-emerald-400" /> In-App Smart Camera & Document Digitizer
+                  <h3 className="text-lg font-extrabold text-[#10142F] flex items-center gap-2">
+                    <Camera className="w-5 h-5 text-[#5B5BEF]" />
+                    <span>In-App Smart Camera & Document Digitizer</span>
                   </h3>
-                  <p className="text-xs text-[#8d8aab] mt-1">
-                    Capture a physical certificate with your camera → auto-extract key fields → ready for import. No third-party apps needed.
+                  <p className="text-xs text-[#69708A] mt-1">
+                    Capture a physical certificate with your camera → auto-extract key fields → ready for import.
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl glass-panel border border-emerald-500/20 space-y-4">
+                <div className="p-6 rounded-3xl glass-card bg-white border-[#DCD9FF] shadow-sm space-y-4">
                   {!cameraStream && !capturedImage && (
                     <div className="space-y-3">
-                      <div className="aspect-video rounded-xl border-2 border-dashed border-emerald-500/25 bg-emerald-500/[0.03] flex flex-col items-center justify-center gap-3">
-                        <Camera className="w-12 h-12 text-emerald-500/50" />
-                        <p className="text-sm text-[#7c78a0]">Camera preview will appear here</p>
+                      <div className="aspect-video rounded-2xl border-2 border-dashed border-[#DCD9FF] bg-[#F7F6FF] flex flex-col items-center justify-center gap-3">
+                        <Camera className="w-12 h-12 text-[#69708A]" />
+                        <p className="text-sm font-semibold text-[#69708A]">Camera preview will appear here</p>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <button onClick={startCamera}
-                          className="py-2.5 rounded-xl btn-teal text-sm font-bold flex items-center justify-center gap-2">
+                          className="btn-primary py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md">
                           <Camera className="w-4 h-4" /> Open Camera
                         </button>
-                        <label className="py-2.5 rounded-xl btn-ghost text-sm font-bold flex items-center justify-center gap-2 cursor-pointer border border-white/[0.09]">
+                        <label className="btn-secondary py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer">
                           <FileText className="w-4 h-4" /> Upload File
                           <input type="file" accept="image/*,application/pdf" className="sr-only"
                             onChange={() => simulateDigitize()} />
@@ -814,24 +817,17 @@ export default function StudentDashboard() {
 
                   {cameraStream && (
                     <div className="space-y-3">
-                      <div className="aspect-video rounded-xl overflow-hidden bg-black border border-emerald-500/30 relative">
+                      <div className="aspect-video rounded-2xl overflow-hidden bg-black border border-[#DCD9FF] relative shadow-lg">
                         <video autoPlay playsInline className="w-full h-full object-cover"
                           ref={el => { if (el && cameraStream) el.srcObject = cameraStream; }} />
-                        <div className="absolute inset-0 border-2 border-teal-400/30 rounded-xl pointer-events-none">
-                          <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-teal-400" />
-                          <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-teal-400" />
-                          <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-teal-400" />
-                          <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-teal-400" />
-                          <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-teal-400 to-transparent animate-scanline" />
-                        </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <button onClick={() => { stopCamera(); simulateDigitize(); }}
-                          className="py-2.5 rounded-xl btn-teal text-sm font-bold flex items-center justify-center gap-2">
+                          className="btn-primary py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2">
                           <ScanLine className="w-4 h-4" /> Capture & Digitize
                         </button>
                         <button onClick={stopCamera}
-                          className="py-2.5 rounded-xl btn-ghost text-sm font-semibold border border-white/[0.09]">
+                          className="btn-secondary py-3 rounded-2xl text-xs font-bold">
                           Cancel
                         </button>
                       </div>
@@ -840,31 +836,31 @@ export default function StudentDashboard() {
 
                   {digitizerLoading && (
                     <div className="py-8 text-center space-y-3">
-                      <div className="w-12 h-12 border-2 border-teal-500/30 border-t-teal-400 rounded-full animate-spin mx-auto" />
-                      <p className="text-sm text-teal-400 font-medium">Analysing document structure…</p>
-                      <p className="text-xs text-[#7c78a0]">Extracting credential fields using OCR pipeline</p>
+                      <div className="w-10 h-10 border-3 border-[#E8E6FF] border-t-[#5B5BEF] rounded-full animate-spin mx-auto" />
+                      <p className="text-sm font-bold text-[#10142F]">Analysing document structure…</p>
+                      <p className="text-xs text-[#69708A]">Extracting credential fields using OCR pipeline</p>
                     </div>
                   )}
 
                   {extractedData && !digitizerLoading && (
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                      <div className="flex items-center gap-2 text-[#059669] font-bold text-sm">
                         <CheckCircle2 className="w-4 h-4" /> Extraction Complete — Review & Import
                       </div>
                       <div className="grid gap-2">
                         {Object.entries(extractedData).map(([key, val]) => (
-                          <div key={key} className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.07]">
-                            <span className="text-[11px] font-mono text-[#7c78a0] uppercase">{key.replace(/_/g, " ")}</span>
-                            <span className="text-xs font-semibold text-white max-w-[55%] text-right truncate">{val}</span>
+                          <div key={key} className="flex items-center justify-between p-3 rounded-xl bg-[#F7F6FF] border border-[#DCD9FF]">
+                            <span className="text-[11px] font-mono text-[#69708A] font-bold uppercase">{key.replace(/_/g, " ")}</span>
+                            <span className="text-xs font-bold text-[#10142F] max-w-[55%] text-right truncate">{val}</span>
                           </div>
                         ))}
                       </div>
-                      <div className="flex gap-3">
-                        <button className="flex-1 py-2.5 rounded-xl btn-teal text-sm font-bold flex items-center justify-center gap-2">
+                      <div className="flex gap-3 pt-2">
+                        <button className="flex-1 py-3 rounded-2xl btn-primary text-xs font-bold flex items-center justify-center gap-2">
                           <Check className="w-4 h-4" /> Import to Wallet
                         </button>
                         <button onClick={() => setExtractedData(null)}
-                          className="py-2.5 px-4 rounded-xl btn-ghost text-sm border border-white/[0.09]">
+                          className="btn-secondary py-3 px-5 rounded-2xl text-xs font-bold">
                           Discard
                         </button>
                       </div>
@@ -879,14 +875,15 @@ export default function StudentDashboard() {
           <div className="lg:col-span-5 space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Share2 className="w-5 h-5 text-violet-400" /> Consent Manager
+                <h3 className="text-lg font-extrabold text-[#10142F] flex items-center gap-2">
+                  <Share2 className="w-5 h-5 text-[#5B5BEF]" />
+                  <span>Consent Manager</span>
                 </h3>
-                <p className="text-xs text-[#8d8aab]">You control exactly what employers see.</p>
+                <p className="text-xs text-[#69708A]">You control exactly what employers see.</p>
               </div>
-              <div className="flex gap-2">
+              <div>
                 {pendingConsents.length > 0 && (
-                  <span className="text-[11px] font-mono px-2.5 py-1 rounded-full badge-amber font-bold animate-pulse-glow">
+                  <span className="text-[11px] font-mono px-3 py-1 rounded-full badge-amber font-bold shadow-sm">
                     {pendingConsents.length} pending
                   </span>
                 )}
@@ -894,27 +891,27 @@ export default function StudentDashboard() {
             </div>
 
             {consents.length === 0 ? (
-              <div className="p-8 text-center glass-panel rounded-2xl border border-white/[0.07]">
-                <Share2 className="w-8 h-8 text-[#3d3a5c] mx-auto mb-2" />
-                <h4 className="text-sm font-bold text-white">No Requests Yet</h4>
-                <p className="text-xs text-[#7c78a0] mt-1">Log in as an employer to send a verification request.</p>
+              <div className="p-8 text-center glass-card bg-white rounded-2xl border-[#DCD9FF] shadow-sm">
+                <Share2 className="w-8 h-8 text-[#69708A] mx-auto mb-2" />
+                <h4 className="text-sm font-bold text-[#10142F]">No Requests Yet</h4>
+                <p className="text-xs text-[#69708A] mt-1">Log in as an employer to send a verification request.</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {consents.map(consent => (
-                  <div key={consent.id} className={`p-5 rounded-2xl glass-panel border relative ${
+                  <div key={consent.id} className={`p-5 rounded-2xl glass-card bg-white border shadow-sm ${
                     consent.status === "PENDING" && consent.overshare_warnings?.length
-                      ? "border-orange-500/30"
-                      : "border-white/[0.07]"
+                      ? "border-[#FED7AA] bg-[#FFF7ED]/30"
+                      : "border-[#DCD9FF]"
                   }`}>
                     {/* Over-Share Warning Banner */}
                     {consent.overshare_warnings && consent.overshare_warnings.length > 0 && (
-                      <div className="mb-3 p-3 rounded-xl bg-orange-500/10 border border-orange-500/25 flex items-start gap-2">
-                        <AlertTriangle className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
+                      <div className="mb-3 p-3 rounded-xl bg-[#FFF7ED] border border-[#FED7AA] flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 text-[#EA580C] shrink-0 mt-0.5" />
                         <div>
-                          <div className="text-xs font-bold text-orange-300 mb-1">⚠ Anomalous Data Request</div>
+                          <div className="text-xs font-bold text-[#EA580C] mb-1">⚠ Anomalous Data Request</div>
                           {consent.overshare_warnings.slice(0, 2).map((w, i) => (
-                            <p key={i} className="text-[11px] text-orange-200/80">{w}</p>
+                            <p key={i} className="text-[11px] text-[#9A3412]">{w}</p>
                           ))}
                         </div>
                       </div>
@@ -922,43 +919,43 @@ export default function StudentDashboard() {
 
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <div>
-                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded badge-violet font-bold">
+                        <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded badge-indigo font-bold">
                           FROM: {consent.requester_name}
                         </span>
-                        <div className="text-[11px] text-[#5c5880] mt-1 font-mono">
+                        <div className="text-[11px] text-[#69708A] mt-1 font-mono font-medium">
                           {new Date(consent.created_at).toLocaleDateString()}
                         </div>
                       </div>
-                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded uppercase font-bold shrink-0 ${
+                      <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded uppercase font-bold shrink-0 ${
                         consent.status === "APPROVED" ? "badge-lime" :
                         consent.status === "PENDING" ? "badge-amber" : "badge-rose"
                       }`}>{consent.status}</span>
                     </div>
 
                     {/* Purpose + Role Context */}
-                    {(consent.purpose || consent.role_context) && (
-                      <div className="mb-3 text-[11px] bg-black/25 p-2.5 rounded-xl border border-white/[0.05] space-y-1">
+                    {(consent.role_context || consent.purpose) && (
+                      <div className="mb-3 text-[11px] bg-[#F7F6FF] p-3 rounded-xl border border-[#DCD9FF] space-y-1">
                         {consent.role_context && (
-                          <div><span className="text-[#7c78a0]">Role:</span> <span className="text-[#c4c0dc]">{consent.role_context}</span></div>
+                          <div><span className="text-[#69708A] font-bold">Role:</span> <span className="text-[#10142F] font-semibold">{consent.role_context}</span></div>
                         )}
                         {consent.purpose && (
-                          <div><span className="text-[#7c78a0]">Purpose:</span> <span className="text-[#c4c0dc]">{consent.purpose}</span></div>
+                          <div><span className="text-[#69708A] font-bold">Purpose:</span> <span className="text-[#10142F]">{consent.purpose}</span></div>
                         )}
                       </div>
                     )}
 
                     {consent.message && (
-                      <p className="text-xs text-[#a8a4c8] bg-black/25 p-2.5 rounded-xl border border-white/[0.05] italic mb-3">
+                      <p className="text-xs text-[#69708A] bg-[#F7F6FF] p-3 rounded-xl border border-[#DCD9FF] italic mb-3">
                         &ldquo;{consent.message}&rdquo;
                       </p>
                     )}
 
                     {/* Requested Fields */}
                     <div className="mb-4">
-                      <div className="text-[11px] font-semibold text-[#8d8aab] mb-1.5">Requested Fields:</div>
+                      <div className="text-[11px] font-bold text-[#10142F] mb-1.5 uppercase font-mono">Requested Fields:</div>
                       <div className="flex flex-wrap gap-1.5">
                         {consent.requested_fields.map((field, i) => (
-                          <span key={i} className="px-2 py-0.5 rounded-md badge-violet text-[11px] font-mono">
+                          <span key={i} className="px-2.5 py-0.5 rounded-md badge-indigo text-[11px] font-mono font-semibold">
                             ☑ {field}
                           </span>
                         ))}
@@ -966,24 +963,24 @@ export default function StudentDashboard() {
                     </div>
 
                     {consent.status === "PENDING" ? (
-                      <div className="flex gap-2 pt-2 border-t border-white/[0.06]">
+                      <div className="flex gap-2 pt-2 border-t border-[#F0EEFF]">
                         <button onClick={() => handleConsentResponse(consent.id, true)}
-                          className="flex-1 py-2 rounded-xl btn-teal text-xs font-bold flex items-center justify-center gap-1.5">
+                          className="flex-1 py-2.5 rounded-xl btn-primary text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm">
                           <Check className="w-3.5 h-3.5" /> Approve
                         </button>
                         <button onClick={() => handleConsentResponse(consent.id, false)}
-                          className="py-2 px-3 rounded-xl btn-ghost text-xs font-bold border border-white/[0.09] text-rose-400 hover:bg-rose-500/10">
-                          <X className="w-3.5 h-3.5" />
+                          className="py-2.5 px-4 rounded-xl btn-secondary text-xs font-bold text-[#EF4444] border-[#FECACA] hover:bg-[#FEF2F2]">
+                          <X className="w-3.5 h-3.5" /> Deny
                         </button>
                       </div>
                     ) : consent.status === "APPROVED" && consent.verification_token ? (
-                      <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between">
-                        <span className="text-xs text-emerald-400 flex items-center gap-1">
+                      <div className="pt-2 border-t border-[#F0EEFF] flex items-center justify-between">
+                        <span className="text-xs font-bold text-[#059669] flex items-center gap-1">
                           <CheckCircle2 className="w-3.5 h-3.5" /> Token Active
                         </span>
                         <button onClick={() => setQrModalToken(consent.verification_token!)}
-                          className="px-3 py-1.5 rounded-lg badge-violet text-xs font-semibold flex items-center gap-1.5">
-                          <QrCode className="w-3 h-3" /> Show QR
+                          className="px-3.5 py-1.5 rounded-xl btn-secondary text-xs font-bold flex items-center gap-1.5">
+                          <QrCode className="w-3.5 h-3.5 text-[#5B5BEF]" /> Show QR
                         </button>
                       </div>
                     ) : null}
@@ -997,33 +994,35 @@ export default function StudentDashboard() {
 
       {/* ── Modal: Credential Inspector ─────────────── */}
       {activeModalCred && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-          <div className="max-w-2xl w-full glass-panel-glow rounded-3xl p-6 border border-violet-500/25 max-h-[90vh] overflow-y-auto animate-fade-up">
-            <div className="flex items-center justify-between pb-4 border-b border-white/[0.07]">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-teal-400" />
-                <h3 className="text-lg font-bold text-white">Verifiable Credential Payload</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+          <div className="max-w-2xl w-full glass-card bg-white rounded-3xl p-6 sm:p-7 border-[#DCD9FF] shadow-2xl max-h-[90vh] overflow-y-auto animate-fade-up">
+            <div className="flex items-center justify-between pb-4 border-b border-[#F0EEFF]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#F0EEFF] border border-[#DCD9FF] flex items-center justify-center text-[#5B5BEF]">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <h3 className="text-lg font-extrabold text-[#10142F]">Verifiable Credential Payload</h3>
               </div>
-              <button onClick={() => setActiveModalCred(null)} className="p-1.5 rounded-lg btn-ghost text-[#7c78a0]">
+              <button onClick={() => setActiveModalCred(null)} className="p-1 rounded-lg text-[#69708A] hover:text-[#10142F]">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="mt-4 space-y-3">
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] text-xs">
-                <div className="text-[#7c78a0] font-mono mb-0.5">CREDENTIAL ID</div>
-                <div className="text-white font-mono font-bold">{activeModalCred.id}</div>
+            <div className="mt-4 space-y-3.5">
+              <div className="p-3.5 rounded-2xl bg-[#F7F6FF] border border-[#DCD9FF] text-xs">
+                <div className="text-[#69708A] font-mono font-bold mb-0.5">CREDENTIAL ID</div>
+                <div className="text-[#10142F] font-mono font-bold">{activeModalCred.id}</div>
               </div>
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] text-xs">
-                <div className="text-[#7c78a0] font-mono mb-0.5">SHA-256 HASH</div>
-                <div className="text-teal-300 font-mono break-all">{activeModalCred.credential_hash}</div>
+              <div className="p-3.5 rounded-2xl bg-[#F7F6FF] border border-[#DCD9FF] text-xs">
+                <div className="text-[#69708A] font-mono font-bold mb-0.5">SHA-256 HASH</div>
+                <div className="text-[#5B5BEF] font-mono font-semibold break-all">{activeModalCred.credential_hash}</div>
               </div>
               <div>
-                <div className="text-xs font-mono text-[#7c78a0] mb-1">CANONICAL CLAIMS JSON</div>
-                <pre className="p-4 rounded-xl bg-black/60 border border-white/[0.08] text-[11px] font-mono text-emerald-300 overflow-x-auto">
+                <div className="text-xs font-mono font-bold text-[#10142F] mb-1.5 uppercase">CANONICAL CLAIMS JSON</div>
+                <pre className="p-4 rounded-2xl bg-[#10142F] border border-[#DCD9FF] text-[11px] font-mono text-[#A7F3D0] overflow-x-auto shadow-inner">
                   {JSON.stringify(activeModalCred.credential_data, null, 2)}
                 </pre>
               </div>
-              <div className="p-3 rounded-xl bg-violet-500/10 border border-violet-500/20 text-xs text-violet-300">
+              <div className="p-3.5 rounded-2xl bg-[#F0EEFF] border border-[#DCD9FF] text-xs text-[#5B5BEF]">
                 <strong>Signature:</strong> RSA-2048 PKCS#1 PSS. Verifiable without contacting the original issuer.
               </div>
             </div>
@@ -1037,13 +1036,13 @@ export default function StudentDashboard() {
                     alert(err.message || "Failed to run quality check");
                   }
                 }}
-                className="px-4 py-2 rounded-xl btn-teal text-white text-xs font-bold flex items-center gap-1.5"
+                className="btn-primary px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 shadow-md"
               >
-                <Brain className="w-3.5 h-3.5" />
+                <Brain className="w-4 h-4" />
                 <span>Credential Quality Report</span>
               </button>
               <button onClick={() => setActiveModalCred(null)}
-                className="px-4 py-2 rounded-xl btn-ghost text-xs font-semibold border border-white/[0.09]">
+                className="btn-secondary px-5 py-2.5 rounded-2xl text-xs font-bold">
                 Close
               </button>
             </div>
@@ -1053,32 +1052,33 @@ export default function StudentDashboard() {
 
       {/* ── Modal: QR Code ───────────────────────────── */}
       {qrModalToken && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-          <div className="max-w-sm w-full glass-panel-glow rounded-3xl p-6 text-center border border-violet-500/25 animate-fade-up">
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.07]">
-              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                <QrCode className="w-4 h-4 text-teal-400" /> Verifiable Presentation QR
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+          <div className="max-w-sm w-full glass-card bg-white rounded-3xl p-6 text-center border-[#DCD9FF] shadow-2xl animate-fade-up">
+            <div className="flex items-center justify-between pb-3 border-b border-[#F0EEFF]">
+              <h3 className="text-sm font-extrabold text-[#10142F] flex items-center gap-1.5">
+                <QrCode className="w-4 h-4 text-[#5B5BEF]" />
+                <span>Verifiable Presentation QR</span>
               </h3>
-              <button onClick={() => setQrModalToken(null)} className="p-1 rounded-lg text-[#7c78a0] hover:text-white">
+              <button onClick={() => setQrModalToken(null)} className="p-1 rounded-lg text-[#69708A] hover:text-[#10142F]">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-xs text-[#7c78a0] mt-3">
+            <p className="text-xs text-[#69708A] mt-3">
               Present to the employer. Contains only a reference token — never raw credential data.
             </p>
-            <div className="my-5 inline-block p-4 rounded-2xl bg-white shadow-2xl">
+            <div className="my-5 inline-block p-4 rounded-2xl bg-white shadow-xl border border-[#DCD9FF]">
               <QRCodeSVG value={`http://localhost:3000/verify/${qrModalToken}`} size={180} level="H" includeMargin />
             </div>
-            <div className="text-[11px] font-mono text-[#7c78a0] break-all bg-black/40 p-2.5 rounded-xl border border-white/[0.06]">
+            <div className="text-[11px] font-mono text-[#69708A] break-all bg-[#F7F6FF] p-2.5 rounded-xl border border-[#DCD9FF]">
               {qrModalToken}
             </div>
             <div className="mt-4 flex items-center justify-center gap-3">
               <Link href={`/verify/${qrModalToken}`} target="_blank"
-                className="px-4 py-2 rounded-xl btn-violet text-white text-xs font-bold flex items-center gap-1.5">
+                className="btn-primary px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 shadow-md">
                 <ExternalLink className="w-3.5 h-3.5" /> Test Verify
               </Link>
               <button onClick={() => setQrModalToken(null)}
-                className="px-4 py-2 rounded-xl btn-ghost text-xs font-semibold border border-white/[0.09]">
+                className="btn-secondary px-4 py-2.5 rounded-2xl text-xs font-bold">
                 Done
               </button>
             </div>

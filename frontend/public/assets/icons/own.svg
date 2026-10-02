@@ -1,0 +1,7 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" rx="14" fill="#F0EEFF" />
+  <!-- Wallet / Personal Vault Shield -->
+  <path d="M14 16C14 14.8954 14.8954 14 16 14H32C33.1046 14 34 14.8954 34 16V32C34 33.1046 33.1046 34 32 34H16C14.8954 34 14 33.1046 14 32V16Z" stroke="#5B5BEF" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M26 21H34V27H26C24.3431 27 23 25.6569 23 24C23 22.3431 24.3431 21 26 21Z" stroke="#5B5BEF" stroke-width="2" fill="#FFFFFF"/>
+  <circle cx="28" cy="24" r="1.5" fill="#5B5BEF"/>
+</svg>

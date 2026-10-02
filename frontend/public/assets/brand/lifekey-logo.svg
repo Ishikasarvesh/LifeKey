@@ -1,0 +1,35 @@
+<svg width="180" height="44" viewBox="0 0 180 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lk-full-grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7167F6" />
+      <stop offset="50%" stop-color="#5B5BEF" />
+      <stop offset="100%" stop-color="#4338CA" />
+    </linearGradient>
+    <linearGradient id="lk-key-gradient" x1="100" y1="0" x2="160" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5B5BEF" />
+      <stop offset="100%" stop-color="#7167F6" />
+    </linearGradient>
+  </defs>
+
+  <!-- Brand Mark -->
+  <g transform="translate(0, 2)">
+    <circle cx="20" cy="20" r="18" fill="#F0EEFF" />
+    <circle cx="16" cy="15" r="7.5" stroke="url(#lk-full-grad)" stroke-width="2.5" fill="none" />
+    <circle cx="24" cy="15" r="7.5" stroke="url(#lk-full-grad)" stroke-width="2.5" fill="none" opacity="0.85" />
+    <circle cx="20" cy="15" r="2.5" fill="url(#lk-full-grad)" />
+    <path d="M20 22.5V34" stroke="url(#lk-full-grad)" stroke-width="2.75" stroke-linecap="round" />
+    <path d="M20 27.5H25" stroke="url(#lk-full-grad)" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M20 31.5H27" stroke="url(#lk-full-grad)" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="13" cy="11" r="1.2" fill="#FFFFFF" />
+  </g>
+
+  <!-- LifeKey Wordmark -->
+  <text x="48" y="27" font-family="'Nura', system-ui, -apple-system, sans-serif" font-size="21" font-weight="800" letter-spacing="-0.03em" fill="#10142F">
+    Life<tspan fill="url(#lk-key-gradient)">Key</tspan>
+  </text>
+  
+  <!-- Subtle Subline -->
+  <text x="49" y="37" font-family="'Nura', system-ui, -apple-system, sans-serif" font-size="7.5" font-weight="600" letter-spacing="0.12em" fill="#69708A">
+    DIGITAL IDENTITY NETWORK
+  </text>
+</svg>

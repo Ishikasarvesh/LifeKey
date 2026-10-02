@@ -1,0 +1,8 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" rx="14" fill="#F0EEFF" />
+  <!-- Share Node Graph -->
+  <circle cx="31" cy="18" r="4" stroke="#5B5BEF" stroke-width="2.2" fill="#FFFFFF"/>
+  <circle cx="17" cy="24" r="4" stroke="#5B5BEF" stroke-width="2.2" fill="#FFFFFF"/>
+  <circle cx="31" cy="30" r="4" stroke="#5B5BEF" stroke-width="2.2" fill="#FFFFFF"/>
+  <path d="M20.5 22.5L27.5 19.5M20.5 25.5L27.5 28.5" stroke="#5B5BEF" stroke-width="2" stroke-linecap="round"/>
+</svg>

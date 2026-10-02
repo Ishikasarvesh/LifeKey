@@ -1,0 +1,39 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="key-body-grad" x1="40" y1="40" x2="160" y2="160" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E8E6FF" />
+      <stop offset="35%" stop-color="#DCD9FF" />
+      <stop offset="70%" stop-color="#7167F6" />
+      <stop offset="100%" stop-color="#5B5BEF" />
+    </linearGradient>
+    <linearGradient id="key-ring-grad" x1="30" y1="30" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="50%" stop-color="#E8E6FF" />
+      <stop offset="100%" stop-color="#5B5BEF" />
+    </linearGradient>
+    <filter id="key-glow" x="10" y="10" width="180" height="180" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#5B5BEF" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Ambient light orb -->
+  <circle cx="100" cy="100" r="70" fill="#F0EEFF" filter="blur(25px)" />
+
+  <g filter="url(#key-glow)" transform="rotate(-45 100 100)">
+    <!-- Key Head Double Loop (Identity Ring) -->
+    <circle cx="68" cy="100" r="32" stroke="url(#key-ring-grad)" stroke-width="12" fill="none" />
+    <circle cx="68" cy="100" r="16" fill="#FFFFFF" fill-opacity="0.85" />
+    <circle cx="68" cy="100" r="8" fill="#5B5BEF" />
+
+    <!-- Key Shaft -->
+    <path d="M100 95H162C165 95 167 97 167 100C167 103 165 105 162 105H100V95Z" fill="url(#key-body-grad)" />
+
+    <!-- Cryptographic Teeth (Interlocking Digital Nodes) -->
+    <rect x="135" y="105" width="10" height="24" rx="4" fill="url(#key-body-grad)" />
+    <rect x="152" y="105" width="10" height="18" rx="4" fill="url(#key-body-grad)" />
+    <rect x="120" y="105" width="8" height="12" rx="3" fill="url(#key-body-grad)" />
+
+    <!-- Rim highlight -->
+    <path d="M42 80C50 70 65 65 78 68" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
+  </g>
+</svg>

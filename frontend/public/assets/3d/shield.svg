@@ -1,0 +1,43 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shield-grad-front" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="40%" stop-color="#F0EEFF" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#DCD9FF" stop-opacity="0.75" />
+    </linearGradient>
+    <linearGradient id="shield-border-grad" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#DCD9FF" />
+      <stop offset="80%" stop-color="#5B5BEF" />
+      <stop offset="100%" stop-color="#4338CA" />
+    </linearGradient>
+    <linearGradient id="check-grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <filter id="shield-shadow" x="10" y="10" width="180" height="190" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#5B5BEF" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <g filter="url(#shield-shadow)">
+    <!-- Shield Outer Glass Plate -->
+    <path d="M100 24L164 52V104C164 144 136 172 100 184C64 172 36 144 36 104V52L100 24Z" 
+          fill="url(#shield-grad-front)" stroke="url(#shield-border-grad)" stroke-width="3" />
+    
+    <!-- Inner Core Panel -->
+    <path d="M100 40L148 62V104C148 134 126 156 100 166C74 156 52 134 52 104V62L100 40Z" 
+          fill="#FFFFFF" fill-opacity="0.6" stroke="#DCD9FF" stroke-width="1.5" />
+
+    <!-- Frosted Cryptographic Grid Lines -->
+    <line x1="100" y1="44" x2="100" y2="162" stroke="#5B5BEF" stroke-width="1" stroke-dasharray="3 3" opacity="0.4" />
+    <line x1="60" y1="95" x2="140" y2="95" stroke="#5B5BEF" stroke-width="1" stroke-dasharray="3 3" opacity="0.4" />
+
+    <!-- Center Verification Badge -->
+    <circle cx="100" cy="104" r="24" fill="url(#check-grad)" />
+    <path d="M90 104L97 111L112 95" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Light reflection sweep -->
+    <path d="M50 64L85 45C92 48 95 62 82 78L60 98Z" fill="#FFFFFF" fill-opacity="0.5" />
+  </g>
+</svg>
