@@ -19,6 +19,7 @@ import {
   Eye,
   EyeOff,
   Stethoscope,
+  Landmark,
 } from "lucide-react";
 
 export default function LoginPage() {
@@ -27,7 +28,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState(DEMO_ACCOUNTS.STUDENT.email);
   const [password, setPassword] = useState(DEMO_ACCOUNTS.STUDENT.password);
   const [name, setName] = useState("");
-  const [role, setRole] = useState<"STUDENT" | "INSTITUTION" | "EMPLOYER" | "DOCTOR">("STUDENT");
+  const [role, setRole] = useState<"STUDENT" | "INSTITUTION" | "EMPLOYER" | "DOCTOR" | "FINANCE">("STUDENT");
   const [organization, setOrganization] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,7 @@ export default function LoginPage() {
     else if (userRole === "INSTITUTION") router.push("/dashboard/institution");
     else if (userRole === "EMPLOYER") router.push("/dashboard/employer");
     else if (userRole === "DOCTOR") router.push("/dashboard/doctor");
+    else if (userRole === "FINANCE") router.push("/dashboard/finance");
     else router.push("/");
   };
 
@@ -71,6 +73,10 @@ export default function LoginPage() {
       } else {
         if (role === "DOCTOR") {
           router.push("/dashboard/doctor");
+          return;
+        }
+        if (role === "FINANCE") {
+          router.push("/dashboard/finance");
           return;
         }
         const res = await api.register({
@@ -126,7 +132,7 @@ export default function LoginPage() {
               </span>
               <span className="text-[10px] text-[#69708A] font-mono">Real API Login</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
               <button
                 type="button"
                 onClick={() => fillDemo("STUDENT")}
@@ -169,6 +175,17 @@ export default function LoginPage() {
                 <Stethoscope className="w-4 h-4 mb-1 text-[#5B5BEF] group-hover:scale-110 transition-transform" />
                 <span className="text-xs font-bold leading-tight">Doctor</span>
                 <span className="text-[10px] text-[#69708A]">Dr. A. Mehta</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard/finance")}
+                disabled={loading}
+                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-white hover:bg-[#F0EEFF] border border-[#DCD9FF] text-[#10142F] hover:text-[#5B5BEF] transition-all text-center group disabled:opacity-50 shadow-sm"
+              >
+                <Landmark className="w-4 h-4 mb-1 text-[#5B5BEF] group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold leading-tight">Finance</span>
+                <span className="text-[10px] text-[#69708A]">ABC Bank</span>
               </button>
             </div>
           </div>
@@ -238,12 +255,13 @@ export default function LoginPage() {
                   <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1">
                     Account Role
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                     {[
                       { r: "STUDENT", label: "User", icon: User },
                       { r: "INSTITUTION", label: "Institution", icon: Building2 },
                       { r: "EMPLOYER", label: "Employer", icon: Briefcase },
                       { r: "DOCTOR", label: "Doctor", icon: Stethoscope },
+                      { r: "FINANCE", label: "Finance", icon: Landmark },
                     ].map(({ r, label, icon: Icon }) => (
                       <button
                         key={r}
@@ -265,13 +283,15 @@ export default function LoginPage() {
                 {role !== "STUDENT" && (
                   <div>
                     <label className="block text-xs font-bold text-[#10142F] uppercase tracking-wider mb-1">
-                      {role === "DOCTOR" ? "Clinic / Hospital Name" : "Organization / University Name"}
+                      {role === "DOCTOR" ? "Clinic / Hospital Name" : role === "FINANCE" ? "Bank / Financial Institution Name" : "Organization / University Name"}
                     </label>
                     <div className="relative">
                       {role === "INSTITUTION" ? (
                         <Building2 className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[#69708A] pointer-events-none" />
                       ) : role === "DOCTOR" ? (
                         <Stethoscope className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[#69708A] pointer-events-none" />
+                      ) : role === "FINANCE" ? (
+                        <Landmark className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[#69708A] pointer-events-none" />
                       ) : (
                         <Briefcase className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[#69708A] pointer-events-none" />
                       )}
@@ -283,6 +303,8 @@ export default function LoginPage() {
                         placeholder={
                           role === "DOCTOR"
                             ? "e.g. Apollo Multi-Speciality Clinic"
+                            : role === "FINANCE"
+                            ? "e.g. ABC Commercial Bank Ltd"
                             : role === "INSTITUTION"
                             ? "e.g. Stanford University"
                             : "e.g. Google LLC"

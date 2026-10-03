@@ -27,7 +27,7 @@ import { RecordComparison, CredentialQualityReport } from "@/lib/api";
 // ─── Domain & Navigation Types ────────────────────────────
 
 export type DomainType = "academic" | "healthcare" | "finance" | "employment";
-export type GlobalFeature = "wallet" | "passports" | "zk" | "burn" | "intel" | "camera";
+export type GlobalFeature = "wallet" | "passports" | "zk" | "burn" | "intel" | "camera" | "consents";
 export type ActiveView = DomainType | GlobalFeature;
 export type RequestFilterStatus = "ALL" | "PENDING" | "APPROVED" | "REJECTED";
 
@@ -271,10 +271,10 @@ const INITIAL_DOMAIN_REQUESTS: DomainRequest[] = [
   {
     id: "REQ-FIN-01",
     domain: "finance",
-    requester: "HDFC Home Loans Underwriting",
-    requestedDocument: "Income Attestation (ITR-V) & Salary Slips",
-    purpose: "Pre-approved Home Loan Verification",
-    date: "2026-10-02",
+    requester: "ABC Bank",
+    requestedDocument: "Income Verification",
+    purpose: "Loan Application",
+    date: "2026-10-03",
     status: "PENDING",
     expiry: "48 hours single-use access",
   },
@@ -350,6 +350,7 @@ export default function StudentDashboard() {
   const [domainDocuments, setDomainDocuments] = useState<DomainDocument[]>(INITIAL_DOMAIN_DOCUMENTS);
   const [domainRequests, setDomainRequests] = useState<DomainRequest[]>(INITIAL_DOMAIN_REQUESTS);
   const [requestFilter, setRequestFilter] = useState<RequestFilterStatus>("ALL");
+  const [consentDomainFilter, setConsentDomainFilter] = useState<"ALL" | DomainType>("ALL");
   const [domainSearchQuery, setDomainSearchQuery] = useState("");
 
   // Transition Passports state
@@ -423,10 +424,39 @@ export default function StudentDashboard() {
       if (curUser.role === "INSTITUTION") router.push("/dashboard/institution");
       else if (curUser.role === "EMPLOYER") router.push("/dashboard/employer");
       else if (curUser.role === "DOCTOR") router.push("/dashboard/doctor");
+      else if (curUser.role === "FINANCE") router.push("/dashboard/finance");
       return;
     }
     setUser(curUser);
     loadData();
+
+    // Sync any Bank Customer requests from localStorage
+    try {
+      const stored = localStorage.getItem("lifekey_finance_requests");
+      if (stored) {
+        const bankRequests: any[] = JSON.parse(stored);
+        if (Array.isArray(bankRequests) && bankRequests.length > 0) {
+          setDomainRequests(prev => {
+            const nonBankFinance = prev.filter(r => r.domain === "finance" && !r.id.startsWith("REQ-BANK-"));
+            const otherDomains = prev.filter(r => r.domain !== "finance");
+            const converted: DomainRequest[] = bankRequests.map(br => ({
+              id: br.id,
+              domain: "finance" as const,
+              requester: br.notes || "ABC Bank",
+              requestedDocument: Array.isArray(br.requestedItems) ? br.requestedItems.join(", ") : (br.requestedItems || "Income Verification"),
+              purpose: br.purpose || "Loan Application",
+              date: br.date || new Date().toISOString().split("T")[0],
+              status: (br.status.toUpperCase() === "PENDING" ? "PENDING" : br.status.toUpperCase() === "APPROVED" ? "APPROVED" : "REJECTED") as "PENDING" | "APPROVED" | "REJECTED",
+              expiry: br.accessDuration || "48 hours single-use access",
+              verificationToken: br.verificationToken,
+            }));
+            return [...nonBankFinance, ...converted, ...otherDomains];
+          });
+        }
+      }
+    } catch {
+      // fallback
+    }
   }, [router, loadData]);
 
   // ─── Domain Request Actions (Approve / Reject) ───────────
@@ -441,6 +471,51 @@ export default function StudentDashboard() {
     setDomainRequests(prev =>
       prev.map(r => r.id === reqId ? { ...r, status: newStatus, verificationToken: generatedToken } : r)
     );
+
+    // Sync to localStorage for Bank dashboard
+    try {
+      const stored = localStorage.getItem("lifekey_finance_requests");
+      let bankReqs: any[] = stored ? JSON.parse(stored) : [];
+      const bIdx = bankReqs.findIndex(b => b.id === reqId);
+      if (bIdx >= 0) {
+        bankReqs[bIdx].status = approve ? "Approved" : "Rejected";
+        if (generatedToken) bankReqs[bIdx].verificationToken = generatedToken;
+      } else if (req.domain === "finance") {
+        bankReqs.push({
+          id: req.id,
+          customerId: "LK-PAT-1082",
+          customerName: user?.name || "Parth Patil",
+          requestedItems: [req.requestedDocument],
+          purpose: req.purpose,
+          accessDuration: req.expiry,
+          status: approve ? "Approved" : "Rejected",
+          date: req.date,
+          verificationToken: generatedToken,
+        });
+      }
+      localStorage.setItem("lifekey_finance_requests", JSON.stringify(bankReqs));
+
+      if (approve) {
+        const storedShares = localStorage.getItem("lifekey_finance_shared");
+        let sharedList: any[] = storedShares ? JSON.parse(storedShares) : [];
+        const newShare = {
+          id: `SHARE-${Date.now().toString().slice(-4)}`,
+          customerId: "LK-PAT-1082",
+          customerName: user?.name || "Parth Patil",
+          sharedItems: [req.requestedDocument],
+          purpose: req.purpose,
+          consentStatus: "Approved",
+          status: "Active",
+          approvedDate: new Date().toISOString().split("T")[0],
+          expiresIn: req.expiry || "48 hours",
+          verificationToken: generatedToken || "lifekey_token_fin_active",
+        };
+        sharedList.unshift(newShare);
+        localStorage.setItem("lifekey_finance_shared", JSON.stringify(sharedList));
+      }
+    } catch {
+      // fallback
+    }
 
     setActionSuccess(
       approve
@@ -741,6 +816,7 @@ export default function StudentDashboard() {
           {[
             { id: "wallet", label: "Credential Wallet", icon: KeyRound, badge: credentials.length },
             { id: "passports", label: "Transition Passports", icon: Briefcase, badge: activePassportStatus === "PENDING_APPROVAL" ? 1 : undefined },
+            { id: "consents", label: "Requests & Consents", icon: Share2, badge: domainRequests.filter(r => r.status === "PENDING").length },
             { id: "zk", label: "ZK Proofs", icon: Fingerprint, badge: zkProofs.length },
             { id: "burn", label: "Burn Tokens", icon: Flame, badge: burnTokens.filter(b => !b.is_burned).length },
             { id: "intel", label: "Credential Intel", icon: Brain, badge: intelReport?.flags?.length || undefined },
@@ -1551,6 +1627,187 @@ export default function StudentDashboard() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════
+            GLOBAL SUITE: REQUESTS & CONSENTS LEDGER
+           ═══════════════════════════════════════════════════════ */}
+        {activeView === "consents" && (
+          <div className="mt-6 space-y-6 animate-fade-up">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#DCD9FF]">
+              <div>
+                <h3 className="text-2xl font-black text-[#10142F] flex items-center gap-2">
+                  <Share2 className="w-6 h-6 text-[#5B5BEF]" />
+                  <span>Requests & Consents Ledger</span>
+                </h3>
+                <p className="text-xs text-[#69708A] mt-0.5">
+                  Universal citizen consent hub · Approve or reject purpose-bound access requests across all domains.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold px-3 py-1 rounded-full badge-indigo">
+                  {domainRequests.filter(r => r.status === "PENDING").length} Pending Authorization
+                </span>
+              </div>
+            </div>
+
+            {/* Domain Filter Pills */}
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {[
+                { id: "ALL", label: "All Domains" },
+                { id: "finance", label: "💰 Finance" },
+                { id: "healthcare", label: "🏥 Healthcare" },
+                { id: "employment", label: "💼 Employment" },
+                { id: "academic", label: "🎓 Academic" },
+              ].map(({ id, label }) => (
+                <button
+                  key={id}
+                  onClick={() => setConsentDomainFilter(id as any)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                    consentDomainFilter === id
+                      ? "bg-[#5B5BEF] text-white shadow-xs"
+                      : "bg-white text-[#69708A] hover:text-[#10142F] border border-[#DCD9FF]"
+                  }`}
+                >
+                  {label} ({id === "ALL" ? domainRequests.length : domainRequests.filter(r => r.domain === id).length})
+                </button>
+              ))}
+            </div>
+
+            {/* Status Filter Tabs */}
+            <div className="flex gap-1.5 p-1 rounded-xl bg-[#F0EEFF] border border-[#DCD9FF] text-xs font-bold max-w-md">
+              {(["ALL", "PENDING", "APPROVED", "REJECTED"] as RequestFilterStatus[]).map(f => (
+                <button
+                  key={f}
+                  onClick={() => setRequestFilter(f)}
+                  className={`flex-1 py-1.5 rounded-lg transition-all text-center ${
+                    requestFilter === f
+                      ? "bg-white text-[#10142F] shadow-xs"
+                      : "text-[#69708A] hover:text-[#10142F]"
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            {/* Requests Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {domainRequests
+                .filter(r => {
+                  if (consentDomainFilter !== "ALL" && r.domain !== consentDomainFilter) return false;
+                  if (requestFilter === "PENDING") return r.status === "PENDING";
+                  if (requestFilter === "APPROVED") return r.status === "APPROVED";
+                  if (requestFilter === "REJECTED") return r.status === "REJECTED";
+                  return true;
+                })
+                .map(req => (
+                  <div
+                    key={req.id}
+                    className={`p-5 rounded-2xl glass-card bg-white border shadow-sm transition-all flex flex-col justify-between ${
+                      req.status === "PENDING"
+                        ? "border-amber-300 bg-amber-50/10 shadow-md shadow-amber-500/5"
+                        : req.status === "APPROVED"
+                        ? "border-emerald-300"
+                        : "border-rose-200"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-xl bg-[#F0EEFF] border border-[#DCD9FF] flex items-center justify-center text-[#5B5BEF]">
+                            {req.domain === "finance" ? (
+                              <Landmark className="w-4 h-4 text-emerald-600" />
+                            ) : req.domain === "healthcare" ? (
+                              <HeartPulse className="w-4 h-4 text-rose-500" />
+                            ) : req.domain === "employment" ? (
+                              <Briefcase className="w-4 h-4 text-amber-500" />
+                            ) : (
+                              <GraduationCap className="w-4 h-4 text-[#5B5BEF]" />
+                            )}
+                          </div>
+                          <div>
+                            <span className="text-xs font-black text-[#10142F] block">
+                              {req.requester}
+                            </span>
+                            <span className="text-[10px] font-mono text-[#69708A]">
+                              {req.domain.toUpperCase()} · {req.date}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span
+                          className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1 ${
+                            req.status === "APPROVED"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : req.status === "PENDING"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-rose-100 text-rose-800"
+                          }`}
+                        >
+                          {req.status === "APPROVED" && "🟢 Approved"}
+                          {req.status === "PENDING" && "🟡 Pending"}
+                          {req.status === "REJECTED" && "🔴 Rejected"}
+                        </span>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-[#F7F6FF] border border-[#DCD9FF]/70 text-xs space-y-1.5 mb-3">
+                        <div>
+                          <span className="text-[10px] font-mono uppercase text-[#69708A] font-bold block">
+                            Requested Credential:
+                          </span>
+                          <strong className="text-[#10142F] text-xs font-extrabold">{req.requestedDocument}</strong>
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-mono uppercase text-[#69708A] font-bold block">
+                            Stated Purpose:
+                          </span>
+                          <span className="text-[#10142F] font-semibold">{req.purpose}</span>
+                        </div>
+                        <div className="text-[11px] text-[#69708A] font-mono">
+                          <span>Access: {req.expiry}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      {/* Action buttons for pending */}
+                      {req.status === "PENDING" && (
+                        <div className="flex gap-2 pt-2 border-t border-[#F0EEFF]">
+                          <button
+                            onClick={() => handleDomainRequestAction(req.id, true)}
+                            className="flex-1 py-2 rounded-xl btn-primary text-xs font-bold text-white flex items-center justify-center gap-1 shadow-xs"
+                          >
+                            <Check className="w-3.5 h-3.5" /> Approve Token
+                          </button>
+                          <button
+                            onClick={() => handleDomainRequestAction(req.id, false)}
+                            className="py-2 px-3 rounded-xl btn-secondary text-xs font-bold text-rose-600 border-rose-200 hover:bg-rose-50"
+                          >
+                            <X className="w-3.5 h-3.5" /> Reject
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Approved token info */}
+                      {req.status === "APPROVED" && req.verificationToken && (
+                        <div className="pt-2 border-t border-[#F0EEFF] flex items-center justify-between">
+                          <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Token Active
+                          </span>
+                          <button
+                            onClick={() => setQrModalToken(req.verificationToken!)}
+                            className="px-3 py-1 rounded-xl btn-secondary text-xs font-bold flex items-center gap-1 text-[#5B5BEF]"
+                          >
+                            <QrCode className="w-3.5 h-3.5" /> Show QR
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
         )}
