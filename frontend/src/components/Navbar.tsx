@@ -17,6 +17,7 @@ import {
   User as UserIcon,
   ChevronDown,
   Sparkles,
+  Stethoscope,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -109,6 +110,8 @@ export default function Navbar() {
                       ? "/dashboard/student"
                       : user.role === "INSTITUTION"
                       ? "/dashboard/institution"
+                      : user.role === "DOCTOR"
+                      ? "/dashboard/doctor"
                       : "/dashboard/employer"
                   }
                   className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#F0EEFF] hover:bg-[#E8E6FF] text-[#5B5BEF] border border-[#DCD9FF] text-xs font-bold transition-all"
@@ -116,6 +119,7 @@ export default function Navbar() {
                   {user.role === "STUDENT" && <GraduationCap className="w-4 h-4" />}
                   {user.role === "INSTITUTION" && <Building2 className="w-4 h-4" />}
                   {user.role === "EMPLOYER" && <Briefcase className="w-4 h-4" />}
+                  {user.role === "DOCTOR" && <Stethoscope className="w-4 h-4" />}
                   <span>{user.name.split(" ")[0]} ({user.role})</span>
                 </Link>
 
@@ -184,6 +188,8 @@ export default function Navbar() {
                         ? "/dashboard/student"
                         : user.role === "INSTITUTION"
                         ? "/dashboard/institution"
+                        : user.role === "DOCTOR"
+                        ? "/dashboard/doctor"
                         : "/dashboard/employer"
                     }
                     onClick={() => setMobileMenuOpen(false)}
